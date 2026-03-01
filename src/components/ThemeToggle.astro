@@ -1,0 +1,49 @@
+---
+---
+<button id="theme-toggle" aria-label="Basculer le thème">
+  <span class="icon-sun">☀️</span>
+  <span class="icon-moon">🌙</span>
+</button>
+
+<style>
+  button {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--fg);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  button:hover {
+    background: var(--surface);
+  }
+  html.light .icon-moon,
+  html:not(.light) .icon-sun {
+    display: none;
+  }
+  @media (prefers-color-scheme: light) {
+    html:not(.light):not(.dark) .icon-moon { display: none; }
+    html:not(.light):not(.dark) .icon-sun { display: inline; }
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('theme-toggle')!;
+  const html = document.documentElement;
+
+  btn.addEventListener('click', () => {
+    const isLight = html.classList.contains('light');
+    if (isLight) {
+      html.classList.remove('light');
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      html.classList.remove('dark');
+      html.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+</script>

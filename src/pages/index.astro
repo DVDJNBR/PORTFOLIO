@@ -1,0 +1,88 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { projects } from '../data/projects';
+---
+
+<Layout>
+  <div class="page">
+    <header class="header">
+      <div class="header-inner">
+        <span class="site-name">dvdjnbr.fr</span>
+        <ThemeToggle />
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <h1 class="hero-name">David Jnbr</h1>
+        <p class="hero-tagline">À venir</p>
+      </section>
+
+      <section class="projects">
+        <h2 class="section-title">Projets</h2>
+        <div class="project-list">
+          {projects.map(project => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      </section>
+    </main>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .header {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .site-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--fg-muted);
+    letter-spacing: 0.01em;
+  }
+
+  .hero {
+    margin-bottom: 3.5rem;
+  }
+  .hero-name {
+    margin: 0 0 0.4rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .hero-tagline {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--fg-muted);
+  }
+
+  .section-title {
+    margin: 0 0 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+  }
+
+  .project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+</style>

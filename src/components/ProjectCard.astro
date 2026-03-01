@@ -1,0 +1,107 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<a
+  href={project.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="card"
+>
+  <div class="card-content">
+    <div class="card-header">
+      <h2 class="card-title">{project.title}</h2>
+      {project.briefNumber && <span class="brief-badge">Brief #{project.briefNumber}</span>}
+    </div>
+    <p class="card-desc">{project.description}</p>
+    <div class="tags">
+      {project.tags.map(tag => <span class="tag">{tag}</span>)}
+    </div>
+  </div>
+  <span class="card-arrow">→</span>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  }
+  .card:hover {
+    box-shadow: 0 4px 16px var(--shadow);
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .card:hover .card-title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .brief-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+  .card-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+    line-height: 1.5;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--tag-bg);
+    color: var(--tag-fg);
+    border: 1px solid var(--border);
+  }
+  .card-arrow {
+    color: var(--fg-muted);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition: transform 0.2s, color 0.2s;
+  }
+  .card:hover .card-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+</style>
