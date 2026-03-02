@@ -21,5 +21,5 @@ jobs:
           script: |
             cd /home/ubuntu/PORTFOLIO
             git pull origin main
-            npm install
-            npm run build
+            /home/ubuntu/.nvm/versions/node/v24.14.0/bin/npm install
+            /home/ubuntu/.nvm/versions/node/v24.14.0/bin/npm run build
