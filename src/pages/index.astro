@@ -210,13 +210,6 @@ import { projects } from '../data/projects';
 
     let currentIndex = 0;
 
-    // Sort logic wasn't needed as user asked for most recent by default, assuming order array is already correct
-    // But let's build the indicators: < o 0 O 0 o > pattern
-    // If 1 item: O
-    // If 2 items: O 0
-    // If 3 items: o O o
-    // In our case we just update indicators text based on distance to active
-
     const updateCarousel = () => {
       // Move track
       track.style.transform = `translateX(-${currentIndex * 100}%)`;
