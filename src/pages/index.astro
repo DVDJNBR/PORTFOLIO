@@ -229,13 +229,6 @@ import { projects } from '../data/projects';
 
     let currentIndex = 0;
 
-    // Sort logic wasn't needed as user asked for most recent by default, assuming order array is already correct
-    // But let's build the indicators: < o 0 O 0 o > pattern
-    // If 1 item: O
-    // If 2 items: O 0
-    // If 3 items: o O o
-    // In our case we just update indicators text based on distance to active
-
     const updateCarousel = () => {
       const slideWidth = slides[0].offsetWidth;
       const viewportWidth = track.parentElement?.offsetWidth || 0;
@@ -275,6 +268,8 @@ import { projects } from '../data/projects';
 
         indicatorsContainer.appendChild(dot);
       });
+
+      indicatorsContainer.appendChild(fragment);
     };
 
     prevBtn.addEventListener('click', () => {
