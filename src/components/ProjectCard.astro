@@ -39,16 +39,47 @@ const { project } = Astro.props;
     border-radius: 10px;
     text-decoration: none;
     color: inherit;
-    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
   }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  html.dark .card::before {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(147, 197, 253, 0.05) 100%);
+  }
+
   .card:hover {
-    box-shadow: 0 4px 16px var(--shadow);
-    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px var(--accent);
+    transform: translateY(-5px) scale(1.02);
     border-color: var(--accent);
   }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+  }
+
   .card:hover .card-title {
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
+    color: var(--accent);
   }
   .card-content {
     display: flex;
