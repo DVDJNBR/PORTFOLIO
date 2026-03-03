@@ -229,6 +229,7 @@ import { projects } from '../data/projects';
 
     const renderIndicators = () => {
       indicatorsContainer.innerHTML = '';
+      const fragment = document.createDocumentFragment();
 
       // Custom pattern: < o 0 O 0 o > (as asked: o smaller, 0 bigger, O highlighted)
       slides.forEach((_, index) => {
@@ -253,8 +254,10 @@ import { projects } from '../data/projects';
           updateCarousel();
         });
 
-        indicatorsContainer.appendChild(span);
+        fragment.appendChild(span);
       });
+
+      indicatorsContainer.appendChild(fragment);
     };
 
     prevBtn.addEventListener('click', () => {
