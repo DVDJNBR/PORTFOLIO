@@ -194,29 +194,26 @@ import { projects } from '../data/projects';
     gap: 0.75rem;
     margin-top: 1rem;
     user-select: none;
-    font-family: monospace;
-    font-size: 1.2rem;
-    color: var(--fg-muted);
   }
 
-  .indicator {
+  .indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
     cursor: pointer;
     transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
   }
 
-  .indicator:hover {
-    color: var(--fg);
+  .indicator-dot:hover {
+    background: var(--fg-muted);
     transform: scale(1.2);
   }
 
-  .indicator.active {
-    color: var(--accent);
-    font-weight: bold;
+  .indicator-dot.active {
+    background: var(--accent);
     transform: scale(1.3);
+    box-shadow: 0 0 10px var(--accent);
   }
 </style>
 
@@ -231,45 +228,23 @@ import { projects } from '../data/projects';
     if (!track || slides.length === 0) return;
 
     let currentIndex = 0;
-    const indicators: HTMLElement[] = [];
+    const indicatorDots: HTMLElement[] = [];
 
     const initIndicators = () => {
       indicatorsContainer.replaceChildren();
 
-      const leftArrow = document.createElement('span');
-      leftArrow.textContent = '<';
-      leftArrow.className = 'indicator';
-      leftArrow.addEventListener('click', () => {
-        if (currentIndex > 0) {
-          currentIndex--;
-          updateCarousel();
-        }
-      });
-      indicatorsContainer.appendChild(leftArrow);
-
       slides.forEach((_, index) => {
-        const ind = document.createElement('span');
-        ind.className = 'indicator';
+        const dot = document.createElement('div');
+        dot.className = 'indicator-dot';
 
-        ind.addEventListener('click', () => {
+        dot.addEventListener('click', () => {
           currentIndex = index;
           updateCarousel();
         });
 
-        indicators.push(ind);
-        indicatorsContainer.appendChild(ind);
+        indicatorDots.push(dot);
+        indicatorsContainer.appendChild(dot);
       });
-
-      const rightArrow = document.createElement('span');
-      rightArrow.textContent = '>';
-      rightArrow.className = 'indicator';
-      rightArrow.addEventListener('click', () => {
-        if (currentIndex < slides.length - 1) {
-          currentIndex++;
-          updateCarousel();
-        }
-      });
-      indicatorsContainer.appendChild(rightArrow);
     };
 
     const updateCarousel = () => {
@@ -294,14 +269,8 @@ import { projects } from '../data/projects';
       });
 
       // Update indicators
-      indicators.forEach((ind, index) => {
-        if (index === currentIndex) {
-          ind.classList.add('active');
-          ind.textContent = 'O';
-        } else {
-          ind.classList.remove('active');
-          ind.textContent = '0';
-        }
+      indicatorDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
       });
     };
 
