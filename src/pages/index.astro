@@ -256,6 +256,7 @@ import { projects } from '../data/projects';
 
     const renderIndicators = () => {
       indicatorsContainer.replaceChildren();
+      const fragment = document.createDocumentFragment();
 
       slides.forEach((_, index) => {
         const dot = document.createElement('div');
@@ -266,7 +267,7 @@ import { projects } from '../data/projects';
           updateCarousel();
         });
 
-        indicatorsContainer.appendChild(dot);
+        fragment.appendChild(dot);
       });
 
       indicatorsContainer.appendChild(fragment);
