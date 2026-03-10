@@ -228,6 +228,7 @@ import { projects } from '../data/projects';
     if (!track || slides.length === 0) return;
 
     let currentIndex = 0;
+    const indicatorDots: HTMLElement[] = [];
 
     const updateCarousel = () => {
       const slideWidth = slides[0].offsetWidth;
@@ -251,15 +252,17 @@ import { projects } from '../data/projects';
       });
 
       // Update indicators
-      renderIndicators();
+      indicatorDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+      });
     };
 
-    const renderIndicators = () => {
+    const initIndicators = () => {
       indicatorsContainer.replaceChildren();
 
       slides.forEach((_, index) => {
         const dot = document.createElement('div');
-        dot.className = `indicator-dot ${index === currentIndex ? 'active' : ''}`;
+        dot.className = 'indicator-dot';
 
         dot.addEventListener('click', () => {
           currentIndex = index;
@@ -267,9 +270,8 @@ import { projects } from '../data/projects';
         });
 
         indicatorsContainer.appendChild(dot);
+        indicatorDots.push(dot);
       });
-
-      indicatorsContainer.appendChild(fragment);
     };
 
     prevBtn.addEventListener('click', () => {
@@ -287,6 +289,7 @@ import { projects } from '../data/projects';
     });
 
     // Initialize
+    initIndicators();
     updateCarousel();
 
     // Re-calculate on resize
