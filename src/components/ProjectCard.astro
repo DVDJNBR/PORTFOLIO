@@ -14,6 +14,11 @@ const { project } = Astro.props;
   rel="noopener noreferrer"
   class="card"
 >
+  {project.image && (
+    <div class="card-image-wrapper">
+      <img src={project.image} alt={project.title} class="card-image" loading="lazy" />
+    </div>
+  )}
   <div class="card-content">
     <div class="card-header">
       <h2 class="card-title">{project.title}</h2>
@@ -30,10 +35,11 @@ const { project } = Astro.props;
 <style>
   .card {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.25rem 1.5rem;
+    padding: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -42,6 +48,24 @@ const { project } = Astro.props;
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
     overflow: hidden;
+  }
+
+  .card-image-wrapper {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .card:hover .card-image {
+    transform: scale(1.05);
   }
 
   .card::before {
@@ -76,16 +100,15 @@ const { project } = Astro.props;
   .card-content {
     position: relative;
     z-index: 1;
-  }
-
-  .card:hover .card-title {
-    color: var(--accent);
-  }
-  .card-content {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card:hover .card-title {
+    color: var(--accent);
   }
   .card-header {
     display: flex;
@@ -126,6 +149,9 @@ const { project } = Astro.props;
     border: 1px solid var(--border);
   }
   .card-arrow {
+    position: absolute;
+    bottom: 1.25rem;
+    right: 1.5rem;
     color: var(--fg-muted);
     font-size: 1.2rem;
     flex-shrink: 0;
