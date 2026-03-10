@@ -194,26 +194,29 @@ import { projects } from '../data/projects';
     gap: 0.75rem;
     margin-top: 1rem;
     user-select: none;
+    font-family: monospace;
+    font-size: 1.2rem;
+    color: var(--fg-muted);
   }
 
-  .indicator-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border);
+  .indicator {
     cursor: pointer;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
   }
 
-  .indicator-dot:hover {
-    background: var(--fg-muted);
+  .indicator:hover {
+    color: var(--fg);
     transform: scale(1.2);
   }
 
-  .indicator-dot.active {
-    background: var(--accent);
+  .indicator.active {
+    color: var(--accent);
+    font-weight: bold;
     transform: scale(1.3);
-    box-shadow: 0 0 10px var(--accent);
   }
 </style>
 
@@ -228,6 +231,46 @@ import { projects } from '../data/projects';
     if (!track || slides.length === 0) return;
 
     let currentIndex = 0;
+    const indicators: HTMLElement[] = [];
+
+    const initIndicators = () => {
+      indicatorsContainer.replaceChildren();
+
+      const leftArrow = document.createElement('span');
+      leftArrow.textContent = '<';
+      leftArrow.className = 'indicator';
+      leftArrow.addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateCarousel();
+        }
+      });
+      indicatorsContainer.appendChild(leftArrow);
+
+      slides.forEach((_, index) => {
+        const ind = document.createElement('span');
+        ind.className = 'indicator';
+
+        ind.addEventListener('click', () => {
+          currentIndex = index;
+          updateCarousel();
+        });
+
+        indicators.push(ind);
+        indicatorsContainer.appendChild(ind);
+      });
+
+      const rightArrow = document.createElement('span');
+      rightArrow.textContent = '>';
+      rightArrow.className = 'indicator';
+      rightArrow.addEventListener('click', () => {
+        if (currentIndex < slides.length - 1) {
+          currentIndex++;
+          updateCarousel();
+        }
+      });
+      indicatorsContainer.appendChild(rightArrow);
+    };
 
     const updateCarousel = () => {
       const slideWidth = slides[0].offsetWidth;
@@ -251,25 +294,15 @@ import { projects } from '../data/projects';
       });
 
       // Update indicators
-      renderIndicators();
-    };
-
-    const renderIndicators = () => {
-      indicatorsContainer.replaceChildren();
-
-      slides.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.className = `indicator-dot ${index === currentIndex ? 'active' : ''}`;
-
-        dot.addEventListener('click', () => {
-          currentIndex = index;
-          updateCarousel();
-        });
-
-        indicatorsContainer.appendChild(dot);
+      indicators.forEach((ind, index) => {
+        if (index === currentIndex) {
+          ind.classList.add('active');
+          ind.textContent = 'O';
+        } else {
+          ind.classList.remove('active');
+          ind.textContent = '0';
+        }
       });
-
-      indicatorsContainer.appendChild(fragment);
     };
 
     prevBtn.addEventListener('click', () => {
@@ -287,6 +320,7 @@ import { projects } from '../data/projects';
     });
 
     // Initialize
+    initIndicators();
     updateCarousel();
 
     // Re-calculate on resize
