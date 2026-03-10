@@ -15,6 +15,7 @@ export const projects: Project[] = [
     description: "Premier projet pour se familiariser avec Python, remis au goût du jour : le morpion en CLI est devenu une app web full-stack avec une IA Minimax imbattable.",
     url: "https://tictactoe.dvdjnbr.fr/",
     tags: ["Python", "Flask", "JavaScript"],
+    briefNumber: 1,
     image: "https://picsum.photos/seed/tictactoe/600/400"
   },
   {
