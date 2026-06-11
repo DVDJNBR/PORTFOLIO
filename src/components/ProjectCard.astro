@@ -1,32 +1,38 @@
 ---
-import type { Project } from '../data/projects';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 
 interface Props {
-  project: Project;
+  title: string;
+  description: string;
+  url: string;
+  tags: string[];
+  briefNumber?: number;
+  image?: ImageMetadata | null;
 }
 
-const { project } = Astro.props;
+const { title, description, url, tags, briefNumber, image } = Astro.props;
 ---
 
 <a
-  href={project.url}
+  href={url}
   target="_blank"
   rel="noopener noreferrer"
   class="card"
 >
-  {project.image && (
+  {image && (
     <div class="card-image-wrapper">
-      <img src={project.image} alt={project.title} class="card-image" loading="lazy" />
+      <Image src={image} alt={title} class="card-image" loading="lazy" />
     </div>
   )}
   <div class="card-content">
     <div class="card-header">
-      <h2 class="card-title">{project.title}</h2>
-      {project.briefNumber && <span class="brief-badge">Brief #{project.briefNumber}</span>}
+      <h2 class="card-title">{title}</h2>
+      {briefNumber && <span class="brief-badge">Brief #{briefNumber}</span>}
     </div>
-    <p class="card-desc">{project.description}</p>
+    <p class="card-desc">{description}</p>
     <div class="tags">
-      {project.tags.map(tag => <span class="tag">{tag}</span>)}
+      {tags.map(tag => <span class="tag">{tag}</span>)}
     </div>
   </div>
   <span class="card-arrow">→</span>

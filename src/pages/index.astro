@@ -1,8 +1,31 @@
 ---
+import { getCollection } from 'astro:content';
+import type { ImageMetadata } from 'astro';
 import Layout from '../layouts/Layout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
-import { projects } from '../data/projects';
+
+const entries = await getCollection('projects');
+entries.sort((a, b) => b.data.order - a.data.order);
+
+const allImages = import.meta.glob<{ default: ImageMetadata }>(
+  '../content/projects/*/assets/*.{png,jpg,jpeg,webp,avif}'
+);
+
+const projectImages: Record<string, ImageMetadata | null> = {};
+for (const entry of entries) {
+  const folder = entry.id.split('/')[0];
+  const matches = Object.entries(allImages)
+    .filter(([p]) => p.includes(`/projects/${folder}/assets/`))
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  if (matches.length > 0) {
+    const mod = await matches[0][1]();
+    projectImages[entry.id] = mod.default;
+  } else {
+    projectImages[entry.id] = null;
+  }
+}
 ---
 
 <Layout>
@@ -32,9 +55,16 @@ import { projects } from '../data/projects';
 
           <div class="carousel-viewport">
             <div class="project-list">
-              {projects.map((project, i) => (
+              {entries.map((entry, i) => (
                 <div class="project-slide" data-index={i}>
-                  <ProjectCard project={project} />
+                  <ProjectCard
+                    title={entry.data.title}
+                    description={entry.data.description}
+                    url={entry.data.url}
+                    tags={entry.data.tags}
+                    briefNumber={entry.data.briefNumber}
+                    image={projectImages[entry.id]}
+                  />
                 </div>
               ))}
             </div>
@@ -44,7 +74,7 @@ import { projects } from '../data/projects';
         </div>
 
         <div class="carousel-indicators">
-          {/* Les indicateurs < o 0 O 0 o > seront générés par JS selon le nombre de projets */}
+          {/* Les indicateurs seront générés par JS selon le nombre de projets */}
         </div>
       </section>
     </main>
@@ -251,12 +281,10 @@ import { projects } from '../data/projects';
       const slideWidth = slides[0].offsetWidth;
       const viewportWidth = track.parentElement?.offsetWidth || 0;
 
-      // Calculate the position to center the current slide
       const offset = (viewportWidth / 2) - (slideWidth / 2) - (currentIndex * slideWidth);
 
       track.style.transform = `translateX(${offset}px)`;
 
-      // Update slide classes
       slides.forEach((slide, index) => {
         const distance = Math.abs(index - currentIndex);
         slide.classList.remove('is-active', 'is-near');
@@ -268,7 +296,6 @@ import { projects } from '../data/projects';
         }
       });
 
-      // Update indicators
       indicatorDots.forEach((dot, index) => {
         dot.classList.toggle('active', index === currentIndex);
       });
@@ -288,11 +315,9 @@ import { projects } from '../data/projects';
       }
     });
 
-    // Initialize
     initIndicators();
     updateCarousel();
 
-    // Re-calculate on resize
     window.addEventListener('resize', updateCarousel);
   });
 </script>
