@@ -21,7 +21,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_IP }}
           port: 5790
-          username: ubuntu
+          username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/PORTFOLIO
