@@ -7,11 +7,13 @@ on:
   pull_request:
     branches:
       - main
+  repository_dispatch:
+    types: [asset-updated]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'repository_dispatch'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
