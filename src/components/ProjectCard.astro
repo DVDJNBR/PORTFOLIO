@@ -8,7 +8,7 @@ interface Props {
   url: string;
   tags: string[];
   briefNumber?: number;
-  image?: ImageMetadata | null;
+  image?: ImageMetadata | string | null;
 }
 
 const { title, description, url, tags, briefNumber, image } = Astro.props;
@@ -22,7 +22,11 @@ const { title, description, url, tags, briefNumber, image } = Astro.props;
 >
   {image && (
     <div class="card-image-wrapper">
-      <Image src={image} alt={title} class="card-image" loading="lazy" />
+      {typeof image === 'string' ? (
+        <img src={image} alt={title} class="card-image" loading="lazy" />
+      ) : (
+        <Image src={image} alt={title} class="card-image" loading="lazy" />
+      )}
     </div>
   )}
   <div class="card-content">
