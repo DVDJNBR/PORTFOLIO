@@ -1,8 +1,8 @@
 ---
 order: 1
 title: "Tic-tac-toe"
-description: "Premier projet pour se familiariser avec Python, remis au goût du jour : le morpion en CLI est devenu une app web full-stack avec une IA Minimax imbattable."
+description: "Premier projet pour se familiariser avec Python."
 url: "https://tictactoe.dvdjnbr.fr/"
-tags: ["Python", "Flask", "JavaScript"]
+tags: ["Python"]
 githubRepo: "DVDJNBR/TICTACTOE"
 ---
