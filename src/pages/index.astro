@@ -78,6 +78,16 @@ for (const entry of entries) {
         <span class="brand-role">Portfolio · Data Engineer/Analyst</span>
       </div>
       <div class="banner-actions">
+        <div class="banner-stats" aria-label="Statistiques">
+          <span class="stat-pill" title="Duolingo">
+            <span class="stat-icon">🔥</span>
+            <span class="stat-value">—</span>
+          </span>
+          <span class="stat-pill" title="Codewars">
+            <span class="stat-icon">⚔️</span>
+            <span class="stat-value">—</span>
+          </span>
+        </div>
         <div class="social-links">
           <a href="https://www.linkedin.com/in/david-breau" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://x.com/d4v1dbr34u" target="_blank" rel="noopener noreferrer">Twitter</a>
@@ -174,6 +184,34 @@ for (const entry of entries) {
     display: flex;
     align-items: center;
     gap: 1.25rem;
+  }
+
+  .banner-stats {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--tag-bg);
+    color: var(--tag-fg);
+    border: 1px solid var(--border);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .stat-icon {
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  .stat-value {
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
   }
 
   .social-links {
