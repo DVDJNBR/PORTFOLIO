@@ -15,11 +15,13 @@ const allImages = import.meta.glob<{ default: ImageMetadata }>(
 interface ProjectAssets {
   icon: string | null;
   backdrop: string | null;
+  depth: string | null;
 }
 
 function splitAssets(named: { name: string; url: string }[]): ProjectAssets {
   let icon: string | null = null;
   let backdrop: string | null = null;
+  let depth: string | null = null;
 
   for (const { name, url } of named) {
     const base = name.replace(/\.[^.]+$/, '').toLowerCase();
@@ -27,10 +29,12 @@ function splitAssets(named: { name: string; url: string }[]): ProjectAssets {
       icon = url;
     } else if (base === 'transparent-selection') {
       backdrop = url;
+    } else if (base === 'depth-selection') {
+      depth = url;
     }
   }
 
-  return { icon, backdrop };
+  return { icon, backdrop, depth };
 }
 
 async function fetchGithubAssets(repo: string): Promise<ProjectAssets> {
@@ -38,7 +42,7 @@ async function fetchGithubAssets(repo: string): Promise<ProjectAssets> {
     const res = await fetch(`https://api.github.com/repos/${repo}/contents/assets`, {
       headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'portfolio-build' },
     });
-    if (!res.ok) return { icon: null, backdrop: null };
+    if (!res.ok) return { icon: null, backdrop: null, depth: null };
 
     const files: { name: string; type: string; download_url: string }[] = await res.json();
     const named = files
@@ -47,7 +51,7 @@ async function fetchGithubAssets(repo: string): Promise<ProjectAssets> {
 
     return splitAssets(named);
   } catch {
-    return { icon: null, backdrop: null };
+    return { icon: null, backdrop: null, depth: null };
   }
 }
 
@@ -68,9 +72,13 @@ for (const entry of entries) {
   }
   projectAssets[entry.id] = splitAssets(named);
 }
+
+const preloadImages = Object.values(projectAssets).flatMap((a) =>
+  [a.backdrop, a.icon, a.depth].filter((url): url is string => Boolean(url))
+);
 ---
 
-<Layout>
+<Layout preloadImages={preloadImages}>
   <div class="page">
     <header class="banner">
       <div class="banner-identity">
@@ -98,7 +106,9 @@ for (const entry of entries) {
                   title={entry.data.title}
                   description={entry.data.description}
                   url={entry.data.url}
+                  tags={entry.data.tags}
                   backdrop={projectAssets[entry.id]?.backdrop}
+                  depth={projectAssets[entry.id]?.depth}
                 />
               </div>
             ))}
@@ -136,7 +146,7 @@ for (const entry of entries) {
 
 <style>
   .page {
-    max-width: 760px;
+    max-width: 1250px;
     height: 100dvh;
     margin: 0 auto;
     padding: 1.25rem 1.5rem 1.5rem;
@@ -145,35 +155,63 @@ for (const entry of entries) {
   }
 
   .banner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.75rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1.25rem;
+    margin: -1.25rem -1.5rem 1.25rem;
+    padding: 1rem 1.5rem;
+    background:
+      repeating-linear-gradient(
+        115deg,
+        rgba(255, 255, 255, 0.035) 0px,
+        rgba(255, 255, 255, 0.035) 2px,
+        transparent 2px,
+        transparent 10px
+      ),
+      linear-gradient(100deg, #0a0a0c 0%, #1b1b20 55%, #0a0a0c 100%);
+    border-bottom: 3px solid var(--accent);
+    box-shadow: 0 6px 24px -8px rgba(0, 0, 0, 0.6);
   }
 
   .banner-identity {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.1rem;
   }
   .brand-name {
-    font-weight: 700;
-    font-size: 1.05rem;
-    letter-spacing: -0.01em;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.3rem;
+    letter-spacing: 0.03em;
+    color: #f5f5f5;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
   }
   .brand-role {
-    font-size: 0.8rem;
-    color: var(--fg-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: #a8a8ad;
   }
 
   .banner-actions {
     display: flex;
     align-items: center;
     gap: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    .brand-role {
+      display: none;
+    }
+    .banner-actions {
+      gap: 0.6rem;
+    }
+    .social-links {
+      gap: 0.6rem;
+    }
   }
 
   .social-links {
@@ -181,13 +219,23 @@ for (const entry of entries) {
     gap: 1rem;
   }
   .social-links a {
-    color: var(--accent);
+    color: #d8d8dc;
     text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
   }
   .social-links a:hover {
-    text-decoration: underline;
+    color: var(--accent);
+  }
+
+  .banner-actions :global(#theme-toggle) {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #f5f5f5;
+  }
+  .banner-actions :global(#theme-toggle:hover) {
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .main {
@@ -201,6 +249,7 @@ for (const entry of entries) {
     flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     min-height: 0;
   }
 
@@ -215,25 +264,73 @@ for (const entry of entries) {
 
   .stage {
     position: relative;
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    max-width: 1040px;
+    aspect-ratio: 2 / 1;
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+
+  .stage::before {
+    content: '';
+    position: absolute;
+    inset: -10%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 55% 60% at 30% 45%,
+        color-mix(in srgb, var(--accent) 45%, #fff 20%),
+        color-mix(in srgb, var(--accent) 30%, transparent) 45%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 40% 45% at 78% 65%,
+        color-mix(in srgb, var(--accent-2) 35%, transparent),
+        transparent 65%
+      );
+    opacity: 0.5;
   }
 
   .select-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-    gap: 0.35rem;
-    width: 100%;
-    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    height: 72px;
     position: absolute;
-    left: 50%;
-    bottom: 10px;
-    transform: translateX(-50%);
+    left: calc(66.6667% - 40px);
+    right: 20px;
+    bottom: 30px;
+    transform: translateY(50%);
     z-index: 2;
   }
 
+  @media (max-width: 420px) {
+    .stage {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .select-grid {
+      position: static;
+      transform: none;
+      width: auto;
+      max-width: none;
+      margin: 0.5rem auto 0;
+      order: 2;
+    }
+
+    .detail-stage {
+      flex: 1;
+      order: 1;
+    }
+  }
+
   .select-cell {
+    position: relative;
     display: flex;
+    flex-shrink: 0;
     background: none;
     border: none;
     padding: 0;
@@ -243,23 +340,25 @@ for (const entry of entries) {
   }
 
   .select-thumb {
-    width: 100%;
-    aspect-ratio: 1;
-    padding: 0.4rem;
-    border-radius: 6px;
+    width: 36px;
+    height: 68px;
+    padding: 0;
+    border-radius: 0;
     overflow: hidden;
     border: 1px solid var(--border);
     background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 16%, var(--surface)), var(--surface));
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: skewX(-8deg);
     transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
   }
 
   .select-thumb img {
-    width: 100%;
+    width: 130%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
+    transform: skewX(8deg);
   }
 
   .select-thumb-fallback {
@@ -271,14 +370,17 @@ for (const entry of entries) {
   .select-cell:hover .select-thumb {
     border-color: var(--accent);
     background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 30%, var(--surface)), var(--surface));
-    transform: translateY(-3px);
+    transform: skewX(-8deg) translateY(-3px);
   }
 
+  .select-cell[aria-selected='true'] {
+    z-index: 1;
+  }
   .select-cell[aria-selected='true'] .select-thumb {
-    border-color: var(--accent);
+    border-color: #fde047;
     background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 45%, var(--surface)), var(--surface));
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
-    transform: scale(1.08);
+    box-shadow: 0 0 0 3px color-mix(in srgb, #fde047 45%, transparent);
+    transform: skewX(-8deg) scale(1.08);
   }
 
   .detail-stage {
@@ -291,22 +393,10 @@ for (const entry of entries) {
     display: none;
     position: absolute;
     inset: 0;
-    animation: detail-in 0.3s ease;
   }
 
   .detail-slot.is-active {
     display: block;
-  }
-
-  @keyframes detail-in {
-    from {
-      opacity: 0;
-      transform: scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
   }
 </style>
 
@@ -315,20 +405,33 @@ for (const entry of entries) {
     const cells = Array.from(document.querySelectorAll('.select-cell')) as HTMLButtonElement[];
     const slots = Array.from(document.querySelectorAll('.detail-slot')) as HTMLElement[];
 
-    if (cells.length === 0 || slots.length === 0) return;
+    if (slots.length === 0) return;
 
-    const select = (index: number) => {
-      cells.forEach((cell) => {
-        cell.setAttribute('aria-selected', String(Number(cell.dataset.index) === index));
-      });
+    let confirmedIndex = 0;
+
+    const showSlot = (index: number) => {
       slots.forEach((slot) => {
         slot.classList.toggle('is-active', Number(slot.dataset.index) === index);
       });
     };
 
+    const select = (index: number) => {
+      confirmedIndex = index;
+      cells.forEach((cell) => {
+        cell.setAttribute('aria-selected', String(Number(cell.dataset.index) === index));
+      });
+      showSlot(index);
+    };
+
     cells.forEach((cell) => {
       cell.addEventListener('click', () => {
         select(Number(cell.dataset.index));
+      });
+      cell.addEventListener('mouseenter', () => {
+        showSlot(Number(cell.dataset.index));
+      });
+      cell.addEventListener('mouseleave', () => {
+        showSlot(confirmedIndex);
       });
     });
 

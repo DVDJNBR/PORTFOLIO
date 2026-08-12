@@ -1,8 +1,9 @@
 ---
 interface Props {
   title?: string;
+  preloadImages?: string[];
 }
-const { title = 'dvdjnbr — Portfolio' } = Astro.props;
+const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
 ---
 <!doctype html>
 <html lang="fr">
@@ -11,6 +12,10 @@ const { title = 'dvdjnbr — Portfolio' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet" />
+    {preloadImages.map((url) => <link rel="preload" as="image" href={url} />)}
     <!-- Anti-flash: applique le thème avant le premier rendu -->
     <script is:inline>
       (function () {
@@ -30,19 +35,22 @@ const { title = 'dvdjnbr — Portfolio' } = Astro.props;
         --surface: #ffffff;
         --border: #e0e0e0;
         --accent: #3b82f6;
+        --accent-2: #d6006f;
         --shadow: rgba(0, 0, 0, 0.08);
         --tag-bg: #f0f4ff;
         --tag-fg: #1e40af;
+        --font-display: 'Russo One', 'Segoe UI', sans-serif;
       }
 
       @media (prefers-color-scheme: dark) {
         :root:not(.light) {
-          --bg: #111214;
+          --bg: #131a2c;
           --fg: #e8e8e8;
           --fg-muted: #888;
           --surface: #1c1e21;
           --border: #2e3035;
           --accent: #60a5fa;
+          --accent-2: #ff2ea6;
           --shadow: rgba(0, 0, 0, 0.4);
           --tag-bg: #1e2a42;
           --tag-fg: #93c5fd;
@@ -50,12 +58,13 @@ const { title = 'dvdjnbr — Portfolio' } = Astro.props;
       }
 
       html.dark {
-        --bg: #111214;
+        --bg: #131a2c;
         --fg: #e8e8e8;
         --fg-muted: #888;
         --surface: #1c1e21;
         --border: #2e3035;
         --accent: #60a5fa;
+        --accent-2: #ff2ea6;
         --shadow: rgba(0, 0, 0, 0.4);
         --tag-bg: #1e2a42;
         --tag-fg: #93c5fd;
@@ -86,9 +95,32 @@ const { title = 'dvdjnbr — Portfolio' } = Astro.props;
         min-height: 100vh;
         transition: background 0.2s, color 0.2s;
       }
+
+      .arcade-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+        background-image: url('/img/bg-static.jpg');
+        background-size: cover;
+        background-position: center;
+      }
+
+      .arcade-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 45%,
+          transparent 55%,
+          color-mix(in srgb, var(--bg) 55%, transparent) 100%
+        );
+      }
     </style>
   </head>
   <body>
+    <div class="arcade-bg" aria-hidden="true"></div>
     <slot />
   </body>
 </html>
