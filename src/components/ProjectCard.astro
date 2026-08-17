@@ -6,12 +6,13 @@ interface Props {
   tags: string[];
   backdrop?: string | null;
   depth?: string | null;
+  accent?: string;
 }
 
-const { title, description, url, tags, backdrop = null, depth = null } = Astro.props;
+const { title, description, url, tags, backdrop = null, depth = null, accent } = Astro.props;
 ---
 
-<div class="project-block">
+<div class="project-block" style={accent ? `--cell-glow: ${accent};` : undefined}>
   <div class="visual">
     {depth && <img src={depth} alt="" class="silhouette-depth" />}
     {backdrop && <img src={backdrop} alt="" class="silhouette" />}
@@ -25,6 +26,9 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
       {tags.map((tag) => <span class="tag">#{tag}</span>)}
     </div>
     <span class="info-arrow">→</span>
+    <svg class="info-glow" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <rect x="0" y="0" width="100" height="100" pathLength="100" class="info-glow-blur"></rect>
+    </svg>
   </a>
 </div>
 
@@ -123,6 +127,32 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
     to {
       left: 100%;
       opacity: 0;
+    }
+  }
+
+  .info-glow {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .info-glow-blur {
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 8 92;
+    animation: info-glow-travel 26s linear infinite;
+    stroke: color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 55%, white);
+    stroke-width: 3;
+    filter: blur(7px);
+    opacity: 0.85;
+  }
+
+  @keyframes info-glow-travel {
+    to {
+      stroke-dashoffset: -100;
     }
   }
 
