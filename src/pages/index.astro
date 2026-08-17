@@ -85,9 +85,50 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
         <span class="brand-role">Portfolio · Data Engineer/Analyst</span>
       </div>
       <div class="banner-actions">
+        <div class="banner-stats">
+          <a
+            href="https://www.codewars.com/users/DVDJNBR"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="codewars-badge"
+          >
+            <img src="https://www.codewars.com/users/DVDJNBR/badges/micro" alt="Codewars — DVDJNBR" loading="lazy" />
+          </a>
+          <a
+            href="https://www.duolingo.com/profile/d4v1dbr34u"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="duolingo-badge"
+          >
+            <svg width="128" height="20" viewBox="0 0 128 20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Duolingo — 964 jours, 44 260 xp">
+              <defs>
+                <clipPath id="duoClip">
+                  <path d="M5.774 0H122.226L128 10L122.226 20H5.774L0 10Z" />
+                </clipPath>
+              </defs>
+              <path d="M5.774 0H122.226L128 10L122.226 20H5.774L0 10Z" fill="#303133" />
+              <g clip-path="url(#duoClip)">
+                <image href="/img/duolingo-icon.png" x="2" y="1.5" width="17" height="17" />
+                <g transform="translate(13.01 0.67) scale(0.2157)">
+                  <path d="M64.9961 71.0004C73.6878 71.0004 80.7341 66.9588 80.7341 61.9733C80.7341 56.9877 73.6878 52.9458 64.9961 52.9458C56.3043 52.9458 49.2584 56.9874 49.2584 61.9733C49.2584 66.9592 56.3043 71.0004 64.9961 71.0004Z" fill="#FFC800" fill-opacity="0.33"/>
+                  <path d="M62.0861 17.4185C63.5862 15.5272 66.4576 15.5272 67.9578 17.4185L81.5015 32.9533C84.3168 36.3914 85.9968 40.7315 85.9968 45.4496C85.9968 56.6044 76.6059 65.6474 65.0221 65.6474C53.4383 65.6474 44.0474 56.6044 44.0474 45.4496V43.2719L44 26.2204C43.9929 23.7172 45.492 21.7346 47.8219 22.1271C48.2864 22.2052 49.2679 22.5011 49.7077 22.7364L54.5574 25.0175L62.0861 17.4181V17.4185Z" fill="#FF9600"/>
+                  <path d="M66.735 37.1506C65.9976 36.1464 64.4975 36.1464 63.7601 37.1506L58.4655 42.462C53.5496 47.8986 57.811 57.0045 65.3191 56.7946C73.0145 57.0563 77.311 47.3049 71.7753 42.1162L66.735 37.1506Z" fill="#FFC800"/>
+                </g>
+                <text x="34.5" y="15" font-family="Lato, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#FF9600" data-duolingo-streak>964</text>
+                <text x="61.5" y="14.5" font-family="Lato, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="10" fill="#8A8A8A">·</text>
+                <g transform="translate(67.5 4) scale(0.4)">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M14.0367 2.67272C13.8379 0.718003 11.3282 0.0455378 10.1787 1.63898L0.717665 14.7538C-0.157342 15.9667 0.452676 17.6801 1.89732 18.0672L7.2794 19.5093L8.07445 27.3273C8.27323 29.282 10.7829 29.9545 11.9324 28.361L21.3935 15.2462C22.2685 14.0333 21.6585 12.3199 20.2138 11.9328L14.8317 10.4907L14.0367 2.67272Z" fill="#FFD900"/>
+                  <path d="M2.574 16.4882C2.08457 16.3561 2.03731 15.6803 2.50359 15.4813L6.24415 13.8853C6.58188 13.7412 6.96093 13.973 6.98654 14.3393L7.17226 16.9952C7.19787 17.3615 6.85477 17.6438 6.50027 17.5481L2.574 16.4882Z" fill="#F7C100"/>
+                  <path d="M19.717 13.2505C20.2064 13.3826 20.2537 14.0584 19.7874 14.2573L16.0469 15.8533C15.7091 15.9974 15.3301 15.7656 15.3045 15.3993L15.1188 12.7435C15.0931 12.3772 15.4362 12.0949 15.7907 12.1906L19.717 13.2505Z" fill="#FFEF8F"/>
+                </g>
+                <text x="80" y="15" font-family="Lato, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#E8E8E8" data-duolingo-xp>44,260</text>
+              </g>
+            </svg>
+          </a>
+        </div>
         <div class="social-links">
           <a href="https://www.linkedin.com/in/david-breau" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a href="https://x.com/d4v1dbr34u" target="_blank" rel="noopener noreferrer">Twitter</a>
+          <a href="https://x.com/d4v1dbr34u/all" target="_blank" rel="noopener noreferrer">Twitter</a>
         </div>
       </div>
     </header>
@@ -198,8 +239,9 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
 
   .banner-actions {
     display: flex;
-    align-items: center;
-    gap: 1.25rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
     flex-shrink: 0;
   }
 
@@ -208,11 +250,50 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       display: none;
     }
     .banner-actions {
-      gap: 0.6rem;
+      gap: 0.35rem;
     }
     .social-links {
       gap: 0.6rem;
     }
+  }
+
+  .banner-stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .codewars-badge {
+    display: flex;
+    align-items: center;
+    line-height: 0;
+    opacity: 0.9;
+    transition: opacity 0.2s var(--ease-apple);
+  }
+  .codewars-badge:hover {
+    opacity: 1;
+  }
+  .codewars-badge img {
+    display: block;
+    height: 20px;
+    width: auto;
+  }
+
+  .duolingo-badge {
+    display: flex;
+    align-items: center;
+    line-height: 0;
+    opacity: 0.9;
+    transition: opacity 0.2s var(--ease-apple);
+  }
+  .duolingo-badge:hover {
+    opacity: 1;
+  }
+  .duolingo-badge svg {
+    display: block;
+    height: 20px;
+    width: auto;
   }
 
   .social-links {
@@ -370,7 +451,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     stroke: color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 55%, white);
     stroke-linecap: round;
     stroke-dasharray: 12 88;
-    animation: thumb-glow-travel 26s linear infinite;
+    animation: thumb-glow-travel 3s linear infinite;
   }
 
   .thumb-glow-blur {
