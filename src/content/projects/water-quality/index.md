@@ -5,4 +5,5 @@ description: "L'eau potable française comme terrain pour apprendre l'écosystè
 url: "https://qlt-eau-fr-24.dvdjnbr.fr/"
 tags: ["Python", "Databricks", "Azure", "Delta Lake", "Terraform"]
 githubRepo: "DVDJNBR/qlt-eau-FR-24"
+accent: "#22c55e"
 ---

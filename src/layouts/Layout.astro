@@ -12,74 +12,22 @@ const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet" />
     {preloadImages.map((url) => <link rel="preload" as="image" href={url} />)}
-    <!-- Anti-flash: applique le thème avant le premier rendu -->
-    <script is:inline>
-      (function () {
-        var saved = localStorage.getItem('theme');
-        if (saved === 'light') {
-          document.documentElement.classList.add('light');
-        } else if (saved === 'dark') {
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
     <style is:global>
       :root {
-        --bg: #f8f9fa;
-        --fg: #1a1a1a;
-        --fg-muted: #555;
-        --surface: #ffffff;
-        --border: #e0e0e0;
-        --accent: #3b82f6;
-        --accent-2: #d6006f;
-        --shadow: rgba(0, 0, 0, 0.08);
-        --tag-bg: #f0f4ff;
-        --tag-fg: #1e40af;
-        --font-display: 'Russo One', 'Segoe UI', sans-serif;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root:not(.light) {
-          --bg: #131a2c;
-          --fg: #e8e8e8;
-          --fg-muted: #888;
-          --surface: #1c1e21;
-          --border: #2e3035;
-          --accent: #60a5fa;
-          --accent-2: #ff2ea6;
-          --shadow: rgba(0, 0, 0, 0.4);
-          --tag-bg: #1e2a42;
-          --tag-fg: #93c5fd;
-        }
-      }
-
-      html.dark {
-        --bg: #131a2c;
-        --fg: #e8e8e8;
-        --fg-muted: #888;
-        --surface: #1c1e21;
-        --border: #2e3035;
-        --accent: #60a5fa;
-        --accent-2: #ff2ea6;
-        --shadow: rgba(0, 0, 0, 0.4);
-        --tag-bg: #1e2a42;
-        --tag-fg: #93c5fd;
-      }
-
-      html.light {
-        --bg: #f8f9fa;
-        --fg: #1a1a1a;
-        --fg-muted: #555;
-        --surface: #ffffff;
-        --border: #e0e0e0;
-        --accent: #3b82f6;
-        --shadow: rgba(0, 0, 0, 0.08);
-        --tag-bg: #f0f4ff;
-        --tag-fg: #1e40af;
+        --bg: #0a1628;
+        --surface: #0d1119;
+        --elevated: #131826;
+        --fg: #f2f4f8;
+        --fg-muted: #8b95a5;
+        --accent: #57c7ff;
+        --accent-gold: #f4c542;
+        --border: rgba(255, 255, 255, 0.1);
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+        --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.45);
+        --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+        --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
       }
 
       *, *::before, *::after {
@@ -89,38 +37,164 @@ const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
       html, body {
         margin: 0;
         padding: 0;
-        background: var(--bg);
         color: var(--fg);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        font-family: var(--font-display);
         min-height: 100vh;
-        transition: background 0.2s, color 0.2s;
       }
 
-      .arcade-bg {
+      html {
+        background: var(--bg);
+      }
+
+      body {
+        background: transparent;
+        transition: background-color 0.4s ease, color 0.3s ease;
+      }
+
+      .ambient-bg {
         position: fixed;
         inset: 0;
         z-index: -1;
         overflow: hidden;
         pointer-events: none;
-        background-image: url('/img/bg-static.jpg');
-        background-size: cover;
-        background-position: center;
+        background: var(--bg);
       }
 
-      .arcade-bg::after {
-        content: '';
+      .gradient-sphere {
         position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          ellipse at 50% 45%,
-          transparent 55%,
-          color-mix(in srgb, var(--bg) 55%, transparent) 100%
+        top: 50%;
+        left: 50%;
+        border-radius: 50%;
+        filter: blur(60px);
+      }
+
+      .sphere-1 {
+        width: 34vw;
+        height: 34vw;
+        margin: -17vw 0 0 -17vw;
+        background: linear-gradient(
+          40deg,
+          color-mix(in srgb, var(--accent) 48%, transparent),
+          color-mix(in srgb, var(--accent) 4%, transparent)
         );
+        animation: orbit-1 26s linear infinite;
+      }
+
+      .sphere-2 {
+        width: 36vw;
+        height: 36vw;
+        margin: -18vw 0 0 -18vw;
+        background: linear-gradient(
+          240deg,
+          color-mix(in srgb, var(--accent) 40%, #001a3d),
+          color-mix(in srgb, var(--accent) 4%, transparent)
+        );
+        animation: orbit-2 34s linear infinite reverse;
+      }
+
+      .sphere-3 {
+        width: 26vw;
+        height: 26vw;
+        margin: -13vw 0 0 -13vw;
+        background: linear-gradient(
+          120deg,
+          color-mix(in srgb, var(--accent) 35%, white),
+          color-mix(in srgb, var(--accent) 3%, transparent)
+        );
+        animation: orbit-3 20s linear infinite;
+      }
+
+      .shadow-orb {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border-radius: 50%;
+        filter: blur(60px);
+        background: radial-gradient(
+          circle,
+          color-mix(in srgb, var(--bg) 55%, black) 0%,
+          transparent 75%
+        );
+      }
+
+      .shadow-orb-1 {
+        width: 17vw;
+        height: 17vw;
+        margin: -8.5vw 0 0 -8.5vw;
+        animation: orbit-4 30s linear infinite;
+      }
+
+      .shadow-orb-2 {
+        width: 13vw;
+        height: 13vw;
+        margin: -6.5vw 0 0 -6.5vw;
+        animation: orbit-5 22s linear infinite reverse;
+      }
+
+      @keyframes orbit-4 {
+        from {
+          transform: rotate(0deg) translateX(11vw) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(11vw) rotate(-360deg);
+        }
+      }
+
+      @keyframes orbit-5 {
+        from {
+          transform: rotate(0deg) translateX(6vw) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(6vw) rotate(-360deg);
+        }
+      }
+
+      @keyframes orbit-1 {
+        from {
+          transform: rotate(0deg) translateX(13vw) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(13vw) rotate(-360deg);
+        }
+      }
+
+      @keyframes orbit-2 {
+        from {
+          transform: rotate(0deg) translateX(9vw) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(9vw) rotate(-360deg);
+        }
+      }
+
+      @keyframes orbit-3 {
+        from {
+          transform: rotate(0deg) translateX(7vw) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(7vw) rotate(-360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .sphere-1,
+        .sphere-2,
+        .sphere-3,
+        .shadow-orb-1,
+        .shadow-orb-2 {
+          animation: none;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="arcade-bg" aria-hidden="true"></div>
+    <div class="ambient-bg" aria-hidden="true">
+      <span class="shadow-orb shadow-orb-1"></span>
+      <span class="shadow-orb shadow-orb-2"></span>
+      <span class="gradient-sphere sphere-1"></span>
+      <span class="gradient-sphere sphere-2"></span>
+      <span class="gradient-sphere sphere-3"></span>
+    </div>
     <slot />
   </body>
 </html>
