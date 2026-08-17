@@ -22,7 +22,7 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
     <span class="name-rule"></span>
     <p class="info-desc">{description}</p>
     <div class="info-tags">
-      {tags.map((tag) => <span class="tag">{tag}</span>)}
+      {tags.map((tag) => <span class="tag">#{tag}</span>)}
     </div>
     <span class="info-arrow">→</span>
   </a>
@@ -51,7 +51,7 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform: perspective(1400px) rotateY(-10deg);
+    transform: perspective(1400px) rotateY(-7deg);
     transform-origin: right center;
     z-index: 1;
   }
@@ -62,9 +62,11 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform: perspective(1400px) rotateY(-10deg) translateX(-14px);
+    transform: perspective(1400px) rotateY(-7deg) translateX(-10px);
     transform-origin: right center;
     z-index: 0;
+    opacity: 0.4;
+    filter: blur(2px);
   }
 
   .info {
@@ -75,102 +77,103 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
     left: calc(66.6667% - 40px);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    text-align: center;
-    gap: 0.5rem;
+    text-align: left;
+    gap: 0.65rem;
     text-decoration: none;
     color: inherit;
-    padding: 1.75rem;
+    padding: 1.75rem 2rem;
     box-sizing: border-box;
     z-index: 1;
     overflow: hidden;
-    background: rgba(8, 8, 10, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
     border-radius: 0;
-    box-shadow:
-      -10px 12px 30px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: background 0.25s var(--ease-apple);
+    clip-path: inset(0 100% 0 0);
+    animation: panel-reveal 0.35s var(--ease-apple) forwards;
+  }
+  .info:hover {
+    background: rgba(0, 0, 0, 0.4);
   }
   .info::before {
     content: '';
     position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.05) 0px,
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-    mix-blend-mode: overlay;
-    opacity: 0.5;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    z-index: 2;
+    background: linear-gradient(to bottom, transparent, var(--accent-gold), transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-gold) 80%, transparent);
+    animation: panel-beam 0.35s var(--ease-apple) forwards;
   }
-  .info > * {
-    position: relative;
-    z-index: 1;
+
+  @keyframes panel-reveal {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
   }
-  .info:hover {
-    border-color: rgba(255, 255, 255, 0.24);
+
+  @keyframes panel-beam {
+    from {
+      left: 0%;
+      opacity: 1;
+    }
+    to {
+      left: 100%;
+      opacity: 0;
+    }
   }
 
   .fighter-name {
     font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 1.35rem;
+    font-weight: 600;
+    font-size: 1.4rem;
     line-height: 1.15;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    color: #ffffff;
-    text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 70%, transparent), 0 2px 3px rgba(0, 0, 0, 0.8);
+    letter-spacing: -0.01em;
+    color: var(--fg);
   }
 
   .name-rule {
-    width: 36px;
-    height: 2px;
-    background: var(--accent);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 80%, transparent);
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--accent-gold);
+    transform: rotate(45deg);
   }
 
   .info-desc {
     margin: 0;
-    font-size: 0.82rem;
-    color: #d4d4d8;
-    line-height: 1.5;
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    line-height: 1.55;
   }
 
   .info-tags {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.35rem;
+    justify-content: flex-start;
+    gap: 0.3rem 0.55rem;
+    width: 100%;
   }
 
   .tag {
-    font-size: 0.62rem;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #d8d8dc;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    font-size: 0.56rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--fg-muted) 65%, var(--bg) 35%);
+    letter-spacing: -0.01em;
   }
 
   .info-arrow {
+    align-self: center;
     color: var(--accent);
     font-size: 1.2rem;
-    transition: transform 0.2s, color 0.2s;
+    transition: transform 0.25s var(--ease-apple), color 0.2s;
   }
   .info:hover .info-arrow {
     transform: translateX(4px);
-    color: #ffffff;
+    color: var(--fg);
   }
 
   @media (max-width: 700px) {
@@ -211,6 +214,7 @@ const { title, description, url, tags, backdrop = null, depth = null } = Astro.p
       width: auto;
       max-width: calc(100% - 1.5rem);
       transform: translateY(-50%);
+      padding: 1.25rem 1.5rem;
     }
   }
 </style>
