@@ -111,9 +111,11 @@ taxiHourBrightness = [
 try:
     font = ImageFont.truetype('/System/Library/Fonts/Menlo.ttc', int(3.9*DRAW))
     font_bold = ImageFont.truetype('/System/Library/Fonts/Menlo.ttc', int(3.9*DRAW), index=1)
+    font_bold_large = ImageFont.truetype('/System/Library/Fonts/Menlo.ttc', int(5.2*DRAW), index=1)
 except Exception:
     font = ImageFont.load_default()
     font_bold = font
+    font_bold_large = font
 
 topLaneY = groundY
 laneHeight = 3.5
@@ -178,7 +180,7 @@ for i, b in enumerate(buildings):
         lx, ly = px(xCenter, groundY+13)
         txt = f"{b['h']}h"
         emphasize = b['h'] in (0, 12)
-        useFont = font_bold if emphasize else font
+        useFont = font_bold_large if emphasize else font
         bbox = draw.textbbox((0,0), txt, font=useFont)
         tw, th = bbox[2]-bbox[0], bbox[3]-bbox[1]
         fillA = 220 if emphasize else 166
@@ -219,6 +221,10 @@ for i, b in enumerate(buildings):
         alpha = resized_a.split()[3].point(lambda p: int(p*0.7))
         resized_a.putalpha(alpha)
         im.alpha_composite(resized_a, (int(tp0[0]), int(tp0[1])))
+
+# La courbe reliant les sommets des immeubles est maintenant un element SVG vivant
+# (TaxiHourlyClock.astro), pas cuite ici, car son fondu doit rester fixe par rapport a la fenetre
+# visible (pas a la bande qui defile) — un fondu cuit dans l'image se repeterait a chaque tuile.
 
 final = im.resize((int(stripWidth * SCALE), int((y_max - y_min) * SCALE)), Image.LANCZOS)
 final.save('/Users/davidjbreau/dev/PORTFOLIO/public/img/skyline-strip.png')
