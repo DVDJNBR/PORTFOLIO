@@ -1,5 +1,5 @@
 import math
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
 SCALE = 6
 SS = 3  # supersample factor: draw at SCALE*SS then downsample for anti-aliased edges
@@ -100,6 +100,14 @@ SPIRE = '#6b6b70'
 
 taxi_sprite = Image.open('/Users/davidjbreau/dev/PORTFOLIO/public/img/taxi-pixel.png').convert('RGBA')
 
+# Meme courbe brightness que taxi-daynight / bgTaxiFilter dans TaxiHourlyClock.astro (24 paliers,
+# 1 par heure), pour que les taxis de la voie du haut (cuits ici) suivent le meme cycle jour/nuit
+# que le taxi heros et les taxis de la voie du bas.
+taxiHourBrightness = [
+    0.78, 0.76, 0.74, 0.74, 0.78, 0.84, 0.9, 0.94, 0.968, 0.984, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 0.984, 0.968, 0.94, 0.912, 0.88, 0.84, 0.8,
+]
+
 try:
     font = ImageFont.truetype('/System/Library/Fonts/Menlo.ttc', int(3.9*DRAW))
     font_bold = ImageFont.truetype('/System/Library/Fonts/Menlo.ttc', int(3.9*DRAW), index=1)
@@ -191,18 +199,22 @@ for i, b in enumerate(buildings):
     place_top = False
     if rank <= 3:
         place_top = True
-    elif rank <= 9:
+    elif rank <= 11:
         place_top = alternateTop
-    elif rank <= 16 and hashUnit(b['h']*7.31) < 0.45:
-        place_top = alternateTop
-    if (rank <= 3) or (rank <= 9 and alternateTop) or (rank <= 16 and alternateTop and hashUnit(b['h']*7.31) < 0.45):
+    elif rank <= 21:
+        place_top = alternateTop and hashUnit(b['h'] + 0.41) < 0.5
+    else:
+        place_top = alternateTop and hashUnit(b['h']) < 0.22
+    if place_top:
         tx = xCenter - 6
         ty = topLaneY - 3.75
         tp0 = px(tx, ty)
         sprite_w = int(12*DRAW)
         sprite_h = int(7*DRAW)
         resized = taxi_sprite.resize((sprite_w, sprite_h), Image.NEAREST)
-        resized_a = resized.copy()
+        tinted = ImageEnhance.Brightness(resized).enhance(taxiHourBrightness[b['h'] % 24])
+        resized_a = tinted.copy()
+        resized_a.putalpha(resized.split()[3])
         # apply 0.7 opacity like .bg-taxi
         alpha = resized_a.split()[3].point(lambda p: int(p*0.7))
         resized_a.putalpha(alpha)
