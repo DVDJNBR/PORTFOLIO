@@ -151,7 +151,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                 >
                   {entry.id.startsWith('nyc-taxi') && (
                     <Fragment slot="visual">
-                      <TaxiHourlyClock night />
+                      <TaxiHourlyClock />
                     </Fragment>
                   )}
                 </ProjectCard>
@@ -458,7 +458,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     stroke: color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 55%, white);
     stroke-linecap: round;
     stroke-dasharray: 12 88;
-    animation: thumb-glow-travel 3s linear infinite;
+    animation: none;
   }
 
   .thumb-glow-blur {

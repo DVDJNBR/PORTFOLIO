@@ -1,179 +1,195 @@
 ---
 // Courses de taxi NYC par heure (data/aggregates/hourly.parquet, ~75M courses)
-// Skyline linéaire : chaque immeuble = une heure (hauteur = vraie donnée, fixe).
-// Le taxi est immobile ; la skyline défile derrière lui en boucle.
-// La couleur d'ambiance et les lumières sont partagées par toute la scène (une seule heure "actuelle"
-// à la fois, comme le pic/creux du graphique), animées en CSS, synchronisées sur la boucle de défilement.
-interface Props {
-  night?: boolean;
-}
-const { night = false } = Astro.props;
-
+// La skyline (immeubles, fenêtres, taxis de la voie du haut) est pré-rendue en PNG
+// (voir scripts/gen_skyline.py) pour éviter des milliers d'éléments SVG en direct —
+// seuls la route, le taxi héros et les taxis de la voie du bas restent des éléments vivants
+// (pour pouvoir passer par-dessus le reste).
 const buildings = [
-  { h: 0, L: 38.15, tiers: [[0, 38.15, 9.52], [38.15, 1.14, 6.66]], peak: false },
-  { h: 1, L: 29.25, tiers: [[0, 18.13, 9.42], [18.13, 11.12, 5.18]], peak: false },
-  { h: 2, L: 23.45, tiers: [[0, 11.73, 9.55], [11.73, 6.57, 5.73], [18.3, 5.15, 2.87]], peak: false },
-  { h: 3, L: 19.81, tiers: [[0, 19.81, 9.85], [19.81, 0.59, 6.89]], peak: false },
-  { h: 4, L: 18.0, tiers: [[0, 11.16, 8.29], [11.16, 6.84, 4.56]], peak: false },
-  { h: 5, L: 18.45, tiers: [[0, 9.23, 8.89], [9.23, 5.17, 5.33], [14.4, 4.05, 2.67]], peak: false },
-  { h: 6, L: 25.02, tiers: [[0, 25.02, 9.96], [25.02, 0.75, 6.97]], peak: false },
-  { h: 7, L: 36.13, tiers: [[0, 22.4, 9.37], [22.4, 13.73, 5.15]], peak: false },
-  { h: 8, L: 44.95, tiers: [[0, 22.48, 10.61], [22.48, 12.59, 6.37], [35.07, 9.88, 3.18]], peak: false },
-  { h: 9, L: 47.58, tiers: [[0, 47.58, 11.38], [47.58, 1.43, 7.97]], peak: false },
-  { h: 10, L: 49.55, tiers: [[0, 30.72, 12.1], [30.72, 18.83, 6.66]], peak: false },
-  { h: 11, L: 52.5, tiers: [[0, 26.25, 10.89], [26.25, 14.7, 6.53], [40.95, 11.55, 3.27]], peak: false },
-  { h: 12, L: 56.28, tiers: [[0, 56.28, 11.75], [56.28, 1.69, 8.22]], peak: false },
-  { h: 13, L: 58.25, tiers: [[0, 36.12, 12.47], [36.12, 22.13, 6.86]], peak: false },
-  { h: 14, L: 61.6, tiers: [[0, 30.8, 11.29], [30.8, 17.25, 6.77], [48.05, 13.55, 3.39]], peak: false },
-  { h: 15, L: 63.29, tiers: [[0, 63.29, 11.99], [63.29, 1.9, 8.39]], peak: false },
-  { h: 16, L: 63.05, tiers: [[0, 39.09, 12.54], [39.09, 23.96, 6.9]], peak: false },
-  { h: 17, L: 68.26, tiers: [[0, 34.13, 13.51], [34.13, 19.11, 8.11], [53.24, 15.02, 4.05]], peak: true },
-  { h: 18, L: 71.0, tiers: [[0, 71.0, 12.29], [71.0, 2.13, 8.6]], peak: true },
-  { h: 19, L: 64.62, tiers: [[0, 40.06, 12.38], [40.06, 24.56, 6.81]], peak: true },
-  { h: 20, L: 61.63, tiers: [[0, 30.81, 12.72], [30.81, 17.26, 7.63], [48.07, 13.56, 3.82]], peak: false },
-  { h: 21, L: 62.84, tiers: [[0, 62.84, 11.38], [62.84, 1.89, 7.97]], peak: false },
-  { h: 22, L: 59.52, tiers: [[0, 36.9, 11.7], [36.9, 22.62, 6.44]], peak: false },
-  { h: 23, L: 49.18, tiers: [[0, 24.59, 11.5], [24.59, 13.77, 6.9], [38.36, 10.82, 3.45]], peak: false },
+  { h: 0, L: 38.15 },
+  { h: 1, L: 29.25 },
+  { h: 2, L: 23.45 },
+  { h: 3, L: 19.81 },
+  { h: 4, L: 18.0 },
+  { h: 5, L: 18.45 },
+  { h: 6, L: 25.02 },
+  { h: 7, L: 36.13 },
+  { h: 8, L: 44.95 },
+  { h: 9, L: 47.58 },
+  { h: 10, L: 49.55 },
+  { h: 11, L: 52.5 },
+  { h: 12, L: 56.28 },
+  { h: 13, L: 58.25 },
+  { h: 14, L: 61.6 },
+  { h: 15, L: 63.29 },
+  { h: 16, L: 63.05 },
+  { h: 17, L: 68.26 },
+  { h: 18, L: 71.0 },
+  { h: 19, L: 64.62 },
+  { h: 20, L: 61.63 },
+  { h: 21, L: 62.84 },
+  { h: 22, L: 59.52 },
+  { h: 23, L: 49.18 },
 ];
 
 const slotWidth = 15;
-const heightScale = 1.0;
 const stripWidth = slotWidth * 24;
 const groundY = 108;
-const viewW = 200;
-const viewH = 140;
+const viewW = 380;
+// .taxi-clock déborde jusqu'au bord droit de la carte (inset -50% à droite), donc le bord gauche
+// du panneau description (left: 66.6667% du project-block) tombe environ ici dans le viewBox.
+const rightFadeStart = viewW * 0.63;
+const leftCoverEnd = 3;
+const viewBoxY0 = -52;
+const viewH = 182;
 
-function windowsFor(start: number, len: number, width: number) {
-  if (len < 5 || width < 3.5) return [];
-  const margin = 1.6;
-  const rowGap = 2.6;
-  const usable = len - margin * 2;
-  const rows = Math.max(1, Math.floor(usable / rowGap) + 1);
-  const halfW = width / 2 - 1;
-  const colGap = 2;
-  const cols: number[] = [];
-  if (halfW > 3) {
-    for (let c = -halfW + 1; c <= halfW - 1; c += colGap) cols.push(c);
-  } else if (halfW > 1) {
-    cols.push(-halfW * 0.55, halfW * 0.55);
-  } else {
-    cols.push(0);
-  }
-  const pts: { x: number; y: number }[] = [];
-  for (let r = 0; r < rows; r++) {
-    const d = rows === 1 ? usable / 2 : (usable * r) / (rows - 1);
-    for (const c of cols) {
-      pts.push({ x: start + margin + d, y: c });
-    }
-  }
-  return pts;
-}
+const laneHeight = 3.5;
+const topLaneY = groundY;
+const midLaneY = groundY + laneHeight;
+const bottomLaneY = groundY + laneHeight * 2;
+const roadHeight = laneHeight * 3;
+const buildingBaseY = groundY;
+const axisTopY = buildingBaseY - 71 * 1.8;
+
+// Doit rester identique à y_min/y_max dans scripts/gen_skyline.py, sinon l'image se désaligne.
+const skylineImgYMin = -50;
+const skylineImgYMax = 126;
 
 function hashUnit(seed: number) {
   const x = Math.sin(seed) * 43758.5453;
   return x - Math.floor(x);
 }
 
-// Fenêtres "candidates lumière" : un sous-ensemble fixe de toutes les fenêtres de la scène.
-// Chacune reçoit un palier (a = large plage soir/nuit, b = plage moyenne, c = cœur de nuit) — éteint
-// (bleu) le jour, allumé net (jaune, pas de fondu) sur sa plage horaire. Paliers décalés des deux
-// côtés (entrée en soirée ET sortie le matin), pour que l'allumage ET l'extinction soient progressifs.
-const lightTiers = ['a', 'b', 'c'];
-function lightTierFor(buildingIndex: number, x: number, y: number) {
-  const roll = hashUnit(buildingIndex * 12.9898 + x * 3.71 + y * 7.13);
-  if (roll >= 0.55) return null;
-  const tierRoll = hashUnit(buildingIndex * 51.17 + x * 8.24 + y * 2.13);
-  return lightTiers[Math.floor(tierRoll * lightTiers.length)];
-}
+// Doit rester identique au nightProb de scripts/gen_skyline.py (utilisé là-bas pour les
+// fenêtres/lampadaires, ici pour teinter les nuages selon l'immeuble en dessous).
+const nightProb = [
+  0.75, 0.8, 0.85, 0.85, 0.75, 0.55, 0.35, 0.15,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0.15, 0.35, 0.55, 0.7,
+];
 
-type BuildingTier = [number, number, number];
+// Rang réel de chaque heure par volume de courses (1 = la plus chargée), pour un dégradé de
+// densité en 4 paliers plutôt qu'un plateau saturé : rang 1-3 = les deux voies ; rang 4-9 = une
+// voie (haut/bas en alternance) ; rang 10-16 = parfois un taxi ici ou là (tirage fixe) ; au-delà,
+// rien. La voie du haut est déjà cuite dans l'image ; seule la voie du bas reste à tracer ici.
+const sortedL = [...buildings].sort((a, b) => b.L - a.L);
+const rankByHour = new Map(sortedL.map((b, idx) => [b.h, idx + 1]));
 
-const bodies: { x: number; y: number; w: number; h: number }[] = [];
-const windows: { x: number; y: number; tier: string | null }[] = [];
-const spires: { x: number; y1: number; y2: number }[] = [];
-const hourLabels: { x: number; h: number }[] = [];
-
+const bottomTaxis: { x: number }[] = [];
 buildings.forEach((b, i) => {
   const xCenter = i * slotWidth + slotWidth / 2;
-  (b.tiers as BuildingTier[]).forEach(([start, len, width]) => {
-    const s = start * heightScale;
-    const l = len * heightScale;
-    bodies.push({ x: xCenter - width / 2, y: groundY - s - l, w: width, h: l });
-    windowsFor(s, l, width).forEach((p) => {
-      if (hashUnit(i * 33.71 + p.x * 5.19 + p.y * 9.02) < 0.12) return;
-      windows.push({ x: xCenter + p.y, y: groundY - p.x, tier: lightTierFor(i, p.x, p.y) });
-    });
-  });
-  if (b.peak) {
-    spires.push({ x: xCenter, y1: groundY - b.L * heightScale, y2: groundY - b.L * heightScale - 9 });
-  }
-  if (b.h % 2 === 0) {
-    hourLabels.push({ x: xCenter, h: b.h });
+  const rank = rankByHour.get(b.h) ?? 24;
+  const alternateTop = i % 2 === 0;
+  if (rank <= 3) {
+    bottomTaxis.push({ x: xCenter });
+  } else if (rank <= 9 && !alternateTop) {
+    bottomTaxis.push({ x: xCenter });
+  } else if (rank <= 16 && !alternateTop && hashUnit(b.h * 7.31) < 0.45) {
+    bottomTaxis.push({ x: xCenter });
   }
 });
 
-const axisTopY = groundY - 71 * heightScale;
+// Nuages : ils défilent plus lentement que les immeubles (parallaxe), donc l'heure qui se trouve
+// dessous change avec le temps. Comme les deux mouvements sont à vitesse constante, la vitesse
+// RELATIVE l'est aussi : on peut calculer exactement, en CSS pur (sans JS), le rythme auquel un
+// nouvel immeuble "arrive" sous chaque nuage, et faire tourner sa couleur à ce rythme précis —
+// donc toujours juste, sans dérive, en boucle. Doit rester cohérent avec les durées 60s/130s
+// utilisées plus bas dans le CSS (.skyline-scroll / .clouds-scroll).
+function cloudPuffs(cx: number, cy: number, s: number) {
+  return [
+    [cx - 1.6 * s, cy + 0.2 * s, 1.3 * s],
+    [cx - 0.5 * s, cy - 0.3 * s, 1.6 * s],
+    [cx + 0.7 * s, cy - 0.1 * s, 1.5 * s],
+    [cx + 1.8 * s, cy + 0.3 * s, 1.1 * s],
+  ];
+}
+const cloudSpots: [number, number, number][] = [
+  [60, -16, 4.4],
+  [170, -37, 5.2],
+  [320, -22, 4.8],
+];
+
+const buildingScrollDuration = 60;
+const cloudScrollDuration = 130;
+const buildingSpeed = stripWidth / buildingScrollDuration;
+const cloudSpeed = stripWidth / cloudScrollDuration;
+const relativeSpeed = buildingSpeed - cloudSpeed;
+const cloudHourPeriod = stripWidth / relativeSpeed; // temps pour qu'un tour complet d'heures défile sous un nuage fixe
+const cloudHourStep = cloudHourPeriod / 24;
+
+function cloudDelayFor(cx: number) {
+  const startHour = Math.floor(cx / slotWidth) % 24;
+  return -(startHour * cloudHourStep);
+}
 ---
 
 <div class="taxi-clock">
-  <svg viewBox={`0 0 ${viewW} ${viewH}`} role="img" aria-label="Courses de taxi par heure à New York — pic vers 18h, creux vers 4h du matin">
-    <defs>
-      <linearGradient id="edgeFadeGrad" x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0" stop-color="#fff" stop-opacity="0" />
-        <stop offset="0.08" stop-color="#fff" stop-opacity="1" />
-        <stop offset="0.92" stop-color="#fff" stop-opacity="1" />
-        <stop offset="1" stop-color="#fff" stop-opacity="0" />
-      </linearGradient>
-      <mask id="edgeFade" maskUnits="userSpaceOnUse" x="0" y="0" width={viewW} height={viewH}>
-        <rect x="0" y="0" width={viewW} height={viewH} fill="url(#edgeFadeGrad)" />
-      </mask>
-    </defs>
+  <svg viewBox={`0 ${viewBoxY0} ${viewW} ${viewH}`} role="img" aria-label="Courses de taxi par heure à New York — pic vers 18h, creux vers 4h du matin">
+    <rect class="road road-live" x="0" y={topLaneY} width={stripWidth * 3} height={roadHeight} />
+    <line class="road-line" x1="0" y1={midLaneY} x2={stripWidth * 3} y2={midLaneY} />
+    <line class="road-line" x1="0" y1={bottomLaneY} x2={stripWidth * 3} y2={bottomLaneY} />
 
-    <g mask="url(#edgeFade)">
-      <rect class={night ? 'road road-live' : 'road'} x="0" y={groundY} width={stripWidth * 3} height="6" />
-      <line class="road-line" x1="0" y1={groundY + 3} x2={stripWidth * 3} y2={groundY + 3} />
-
-      <g class="skyline-scroll">
-        {[0, 1, 2].map((rep) => (
-          <g transform={`translate(${rep * stripWidth} 0)`}>
-            {bodies.map((r) => (
-              <rect class={night ? 'building-body building-body-live' : 'building-body'} x={r.x} y={r.y} width={r.w} height={r.h} />
-            ))}
-            {windows.map((w) => (
-              <>
-                <rect class="window" x={w.x - 0.7} y={w.y - 0.7} width="1.4" height="1.4" />
-                {night && w.tier && (
-                  <rect class={`window-lit window-lit-${w.tier}`} x={w.x - 0.7} y={w.y - 0.7} width="1.4" height="1.4" />
-                )}
-              </>
-            ))}
-            {spires.map((s) => (
-              <line class="spire" x1={s.x} y1={s.y1} x2={s.x} y2={s.y2} />
-            ))}
-            {hourLabels.map((hl) => (
-              <text class="hour-label" x={hl.x} y={groundY + 12}>{hl.h}h</text>
-            ))}
-          </g>
-        ))}
-      </g>
+    <g class="clouds-scroll">
+      {[0, 1, 2].map((rep) => (
+        <g transform={`translate(${rep * stripWidth} 0)`}>
+          {cloudSpots.map(([cx, cy, s]) => (
+            <g class="cloud" style={`animation-duration:${cloudHourPeriod}s; animation-delay:${cloudDelayFor(cx)}s`}>
+              {cloudPuffs(cx, cy, s).map(([px, py, r]) => (
+                <circle cx={px} cy={py} r={r} />
+              ))}
+            </g>
+          ))}
+        </g>
+      ))}
     </g>
 
+    <g class="skyline-scroll">
+      {[0, 1, 2].map((rep) => (
+        <image
+          href="/img/skyline-strip.png"
+          x={rep * stripWidth}
+          y={skylineImgYMin}
+          width={stripWidth}
+          height={skylineImgYMax - skylineImgYMin}
+          preserveAspectRatio="none"
+        />
+      ))}
+    </g>
+
+    <image class="taxi" href="/img/taxi-pixel.png" x={viewW / 2 - 6} y={groundY - 0.25} width="12" height="7" />
+
+    <g class="skyline-scroll">
+      {[0, 1, 2].map((rep) => (
+        <g transform={`translate(${rep * stripWidth} 0)`}>
+          {bottomTaxis.map((t) => (
+            <image class="bg-taxi" href="/img/taxi-pixel.png" x={t.x - 6} y={bottomLaneY - 3.75} width="12" height="7" />
+          ))}
+        </g>
+      ))}
+    </g>
+
+    <defs>
+      <linearGradient id="rightFade" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="var(--bg)" stop-opacity="0" />
+        <stop offset="1" stop-color="var(--bg)" stop-opacity="1" />
+      </linearGradient>
+    </defs>
+    <rect class="left-cover" x="0" y={viewBoxY0} width={leftCoverEnd} height={viewH} />
+    <rect x={rightFadeStart} y={viewBoxY0} width={viewW - rightFadeStart} height={viewH} fill="url(#rightFade)" />
+
     <g class="axis">
-      <line class="axis-line" x1="3" y1={groundY} x2="3" y2={axisTopY} />
-      <line class="axis-tick" x1="1.5" y1={groundY} x2="4.5" y2={groundY} />
-      <text class="axis-label" x="6" y={groundY + 1.5}>0</text>
+      <line class="axis-line" x1="3" y1={buildingBaseY} x2="3" y2={axisTopY} />
+      <line class="axis-tick" x1="1.5" y1={buildingBaseY} x2="4.5" y2={buildingBaseY} />
+      <text class="axis-label" x="2.5" y={buildingBaseY + 1.5} style="text-anchor: end">0</text>
       <line class="axis-tick" x1="1.5" y1={axisTopY} x2="4.5" y2={axisTopY} />
       <text class="axis-label" x="6" y={axisTopY + 1.5}>5M courses/h</text>
     </g>
-
-    <image class="taxi" href="/img/taxi-pixel.png" x={viewW / 2 - 6} y={groundY - 5} width="12" height="7" />
   </svg>
 </div>
 
 <style>
   .taxi-clock {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: -30px -50% -30px 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,6 +198,16 @@ const axisTopY = groundY - 71 * heightScale;
   .taxi-clock svg {
     width: 100%;
     height: 100%;
+  }
+
+  .bg-taxi {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    opacity: 0.7;
+  }
+
+  .left-cover {
+    fill: var(--bg);
   }
 
   .road {
@@ -193,7 +219,7 @@ const axisTopY = groundY - 71 * heightScale;
     stroke-width: 0.7;
     stroke-dasharray: 5 5;
     opacity: 0.75;
-    animation: road-dash 40s linear infinite;
+    animation: road-dash 60s linear infinite;
   }
 
   @keyframes road-dash {
@@ -203,8 +229,46 @@ const axisTopY = groundY - 71 * heightScale;
   }
 
   .road-live {
-    animation: road-tint-drift 40s linear infinite;
-    animation-delay: -10s;
+    animation: road-tint-drift 60s linear infinite;
+    animation-delay: -15s;
+  }
+
+  .cloud {
+    animation-name: cloud-hour-drift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .cloud circle {
+    opacity: 0.85;
+  }
+
+  @keyframes cloud-hour-drift {
+    0.0% { fill: #646c7c; }
+    4.1667% { fill: #5c6474; }
+    8.3333% { fill: #535c6d; }
+    12.5% { fill: #535c6d; }
+    16.6667% { fill: #646c7c; }
+    20.8333% { fill: #868d9a; }
+    25.0% { fill: #a7aeb9; }
+    29.1667% { fill: #c9ced7; }
+    33.3333% { fill: #e2e7ee; }
+    37.5% { fill: #e2e7ee; }
+    41.6667% { fill: #e2e7ee; }
+    45.8333% { fill: #e2e7ee; }
+    50.0% { fill: #e2e7ee; }
+    54.1667% { fill: #e2e7ee; }
+    58.3333% { fill: #e2e7ee; }
+    62.5% { fill: #e2e7ee; }
+    66.6667% { fill: #e2e7ee; }
+    70.8333% { fill: #e2e7ee; }
+    75.0% { fill: #e2e7ee; }
+    79.1667% { fill: #e2e7ee; }
+    83.3333% { fill: #c9ced7; }
+    87.5% { fill: #a7aeb9; }
+    91.6667% { fill: #868d9a; }
+    95.8333% { fill: #6c7484; }
+    100% { fill: #646c7c; }
   }
 
   @keyframes road-tint-drift {
@@ -236,102 +300,17 @@ const axisTopY = groundY - 71 * heightScale;
   }
 
   .skyline-scroll {
-    animation: skyline-drift 40s linear infinite;
+    animation: skyline-drift 60s linear infinite;
+  }
+
+  .clouds-scroll {
+    animation: skyline-drift 130s linear infinite;
   }
 
   @keyframes skyline-drift {
     to {
       transform: translateX(-360px);
     }
-  }
-
-  .building-body {
-    fill: #8c8c90;
-    stroke: #55555a;
-    stroke-width: 0.5;
-    stroke-linejoin: round;
-  }
-
-  .building-body-live {
-    animation: scene-tint-drift 40s linear infinite;
-    animation-delay: -10s;
-  }
-
-  @keyframes scene-tint-drift {
-    0.0% { fill: #1e2f66; }
-    4.1667% { fill: #1f2d61; }
-    8.3333% { fill: #202e5c; }
-    12.5% { fill: #212c57; }
-    16.6667% { fill: #222a52; }
-    20.8333% { fill: #3e386a; }
-    25.0% { fill: #5d4984; }
-    29.1667% { fill: #8e6d81; }
-    33.3333% { fill: #b99374; }
-    37.5% { fill: #af937b; }
-    41.6667% { fill: #a69483; }
-    45.8333% { fill: #9b958a; }
-    50.0% { fill: #9c958e; }
-    54.1667% { fill: #9e9b90; }
-    58.3333% { fill: #9f9c95; }
-    62.5% { fill: #ae8f7a; }
-    66.6667% { fill: #bd865d; }
-    70.8333% { fill: #cc7a43; }
-    75.0% { fill: #c76e3e; }
-    79.1667% { fill: #c0643a; }
-    83.3333% { fill: #925062; }
-    87.5% { fill: #6e3f89; }
-    91.6667% { fill: #563380; }
-    95.8333% { fill: #3b2678; }
-    100% { fill: #1e2f66; }
-  }
-
-  .window {
-    fill: #2a4258;
-    opacity: 0.95;
-  }
-
-  .window-lit {
-    fill: var(--accent-gold);
-    animation-duration: 40s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    animation-delay: -10s;
-  }
-
-  .window-lit-a { animation-name: window-glow-a; }
-  .window-lit-b { animation-name: window-glow-b; }
-  .window-lit-c { animation-name: window-glow-c; }
-
-  @keyframes window-glow-a {
-    0% { opacity: 0.95; }
-    29.1167% { opacity: 0.95; }
-    29.1667% { opacity: 0; }
-    79.1167% { opacity: 0; }
-    79.1667% { opacity: 0.95; }
-    100% { opacity: 0.95; }
-  }
-
-  @keyframes window-glow-b {
-    0% { opacity: 0.95; }
-    20.7833% { opacity: 0.95; }
-    20.8333% { opacity: 0; }
-    87.45% { opacity: 0; }
-    87.5% { opacity: 0.95; }
-    100% { opacity: 0.95; }
-  }
-
-  @keyframes window-glow-c {
-    0% { opacity: 0.95; }
-    12.45% { opacity: 0.95; }
-    12.5% { opacity: 0; }
-    95.7833% { opacity: 0; }
-    95.8333% { opacity: 0.95; }
-    100% { opacity: 0.95; }
-  }
-
-  .spire {
-    stroke: #6b6b70;
-    stroke-width: 1.2;
   }
 
   .axis-line,
@@ -348,21 +327,11 @@ const axisTopY = groundY - 71 * heightScale;
     opacity: 0.75;
   }
 
-  .hour-label {
-    font-family: 'SF Mono', ui-monospace, Menlo, monospace;
-    font-size: 3.2px;
-    font-weight: 400;
-    fill: var(--fg-muted);
-    text-anchor: middle;
-    dominant-baseline: middle;
-    opacity: 0.65;
-  }
-
   .taxi {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-    animation: taxi-daynight 40s linear infinite;
-    animation-delay: -10s;
+    animation: taxi-daynight 60s linear infinite;
+    animation-delay: -15s;
   }
 
   @keyframes taxi-daynight {
@@ -395,11 +364,11 @@ const axisTopY = groundY - 71 * heightScale;
 
   @media (prefers-reduced-motion: reduce) {
     .skyline-scroll,
-    .building-body-live,
+    .clouds-scroll,
     .road-live,
     .road-line,
-    .taxi,
-    .window-lit {
+    .cloud,
+    .taxi {
       animation: none;
     }
   }
