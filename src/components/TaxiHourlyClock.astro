@@ -266,7 +266,10 @@ function cloudDelayFor(cx: number) {
       <line class="axis-tick" x1="1.5" y1={buildingBaseY} x2="4.5" y2={buildingBaseY} />
       <text class="axis-label" x="2.5" y={buildingBaseY + 1.5} style="text-anchor: end">0</text>
       <line class="axis-tick" x1="1.5" y1={axisTopY} x2="4.5" y2={axisTopY} />
-      <text class="axis-label" x="6" y={axisTopY + 1.5}>Nbr de courses / heure (moy. quotidienne)</text>
+      <text class="axis-label" x="6" y={axisTopY - 3}>
+        <tspan x="6" dy="0">Nbr de courses / heure</tspan>
+        <tspan x="6" dy="4">(moy. quotidienne)</tspan>
+      </text>
     </g>
   </svg>
 </div>
