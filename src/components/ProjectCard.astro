@@ -14,8 +14,10 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
 
 <div class="project-block" style={accent ? `--cell-glow: ${accent};` : undefined}>
   <div class="visual">
-    {depth && <img src={depth} alt="" class="silhouette-depth" />}
-    {backdrop && <img src={backdrop} alt="" class="silhouette" />}
+    <slot name="visual">
+      {depth && <img src={depth} alt="" class="silhouette-depth" />}
+      {backdrop && <img src={backdrop} alt="" class="silhouette" />}
+    </slot>
   </div>
 
   <a href={url} target="_blank" rel="noopener noreferrer" class="info">

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import type { ImageMetadata } from 'astro';
 import Layout from '../layouts/Layout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import TaxiHourlyClock from '../components/TaxiHourlyClock.astro';
 
 const entries = await getCollection('projects');
 entries.sort((a, b) => b.data.order - a.data.order);
@@ -147,7 +148,13 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                   backdrop={projectAssets[entry.id]?.backdrop}
                   depth={projectAssets[entry.id]?.depth}
                   accent={entry.data.accent}
-                />
+                >
+                  {entry.id.startsWith('nyc-taxi') && (
+                    <Fragment slot="visual">
+                      <TaxiHourlyClock night />
+                    </Fragment>
+                  )}
+                </ProjectCard>
               </div>
             ))}
           </div>
@@ -563,5 +570,22 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     });
 
     select(0);
+
+    fetch('/api/duolingo')
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data: { users?: { streak?: number; totalXp?: number }[] }) => {
+        const user = data.users?.[0];
+        const streakEl = document.querySelector('[data-duolingo-streak]');
+        const xpEl = document.querySelector('[data-duolingo-xp]');
+        if (streakEl && typeof user?.streak === 'number') {
+          streakEl.textContent = String(user.streak);
+        }
+        if (xpEl && typeof user?.totalXp === 'number') {
+          xpEl.textContent = user.totalXp.toLocaleString('en-US');
+        }
+      })
+      .catch(() => {
+        // relais nginx pas encore en place / indisponible : on garde les valeurs statiques
+      });
   });
 </script>
