@@ -31,15 +31,16 @@ const buildings = [
   { h: 23, L: 49.18 },
 ];
 
-// Nombre réel de courses par heure (data/aggregates/hourly.parquet), pour l'étiquette au-dessus
-// de chaque sommet de la courbe.
+// Nombre moyen de courses par heure, PAR JOUR (data/aggregates/hourly.parquet cumulé sur toute
+// la période, divisé par 641 jours réels du dataset — 2023-12-31 → 2025-10-01), pour l'étiquette
+// au-dessus de chaque sommet de la courbe.
 const tripCounts = [
-  2289056, 1493282, 975933, 649967, 488646, 529122, 1115812, 2108478,
-  2896513, 3130733, 3307182, 3570907, 3908527, 4084444, 4383804, 4534786,
-  4512982, 4978373, 5223120, 4652793, 4386022, 4493823, 4197274, 3273960,
+  3571, 2330, 1523, 1014, 762, 825, 1741, 3289,
+  4519, 4884, 5159, 5571, 6098, 6372, 6839, 7075,
+  7041, 7767, 8148, 7259, 6842, 7011, 6548, 5108,
 ];
 function formatTrips(count: number) {
-  return `${(count / 1_000_000).toFixed(1).replace('.', ',')}M`;
+  return count.toLocaleString('fr-FR');
 }
 
 const slotWidth = 15;
@@ -265,7 +266,7 @@ function cloudDelayFor(cx: number) {
       <line class="axis-tick" x1="1.5" y1={buildingBaseY} x2="4.5" y2={buildingBaseY} />
       <text class="axis-label" x="2.5" y={buildingBaseY + 1.5} style="text-anchor: end">0</text>
       <line class="axis-tick" x1="1.5" y1={axisTopY} x2="4.5" y2={axisTopY} />
-      <text class="axis-label" x="6" y={axisTopY + 1.5}>Nbr de courses / heure</text>
+      <text class="axis-label" x="6" y={axisTopY + 1.5}>Nbr de courses / heure (moy. quotidienne)</text>
     </g>
   </svg>
 </div>
