@@ -1,164 +1,406 @@
 ---
 // Courses de taxi NYC par heure (data/aggregates/hourly.parquet, ~75M courses)
-// Chaque heure = un immeuble stylisé (silhouette skyline), disposé en cadran.
+// Skyline linéaire : chaque immeuble = une heure (hauteur = vraie donnée, fixe).
+// Le taxi est immobile ; la skyline défile derrière lui en boucle.
+// La couleur d'ambiance et les lumières sont partagées par toute la scène (une seule heure "actuelle"
+// à la fois, comme le pic/creux du graphique), animées en CSS, synchronisées sur la boucle de défilement.
 interface Props {
   night?: boolean;
 }
 const { night = false } = Astro.props;
-const r0 = 36;
+
 const buildings = [
-  { h: 0, angle: -90.0, color: '#41769b', L: 38.15, tiers: [[0, 38.15, 9.52], [38.15, 1.14, 6.66]], peak: false },
-  { h: 1, angle: -75.0, color: '#3b6080', L: 29.25, tiers: [[0, 18.13, 9.42], [18.13, 11.12, 5.18]], peak: false },
-  { h: 2, angle: -60.0, color: '#38516f', L: 23.45, tiers: [[0, 11.73, 9.55], [11.73, 6.57, 5.73], [18.3, 5.15, 2.87]], peak: false },
-  { h: 3, angle: -45.0, color: '#354863', L: 19.81, tiers: [[0, 19.81, 9.85], [19.81, 0.59, 6.89]], peak: false },
-  { h: 4, angle: -30.0, color: '#34445e', L: 18.0, tiers: [[0, 11.16, 8.29], [11.16, 6.84, 4.56]], peak: false },
-  { h: 5, angle: -15.0, color: '#34455f', L: 18.45, tiers: [[0, 9.23, 8.89], [9.23, 5.17, 5.33], [14.4, 4.05, 2.67]], peak: false },
-  { h: 6, angle: 0.0, color: '#395573', L: 25.02, tiers: [[0, 25.02, 9.96], [25.02, 0.75, 6.97]], peak: false },
-  { h: 7, angle: 15.0, color: '#407195', L: 36.13, tiers: [[0, 22.4, 9.37], [22.4, 13.73, 5.15]], peak: false },
-  { h: 8, angle: 30.0, color: '#4687b0', L: 44.95, tiers: [[0, 22.48, 10.61], [22.48, 12.59, 6.37], [35.07, 9.88, 3.18]], peak: false },
-  { h: 9, angle: 45.0, color: '#488db8', L: 47.58, tiers: [[0, 47.58, 11.38], [47.58, 1.43, 7.97]], peak: false },
-  { h: 10, angle: 60.0, color: '#4992be', L: 49.55, tiers: [[0, 30.72, 12.1], [30.72, 18.83, 6.66]], peak: false },
-  { h: 11, angle: 75.0, color: '#4b99c7', L: 52.5, tiers: [[0, 26.25, 10.89], [26.25, 14.7, 6.53], [40.95, 11.55, 3.27]], peak: false },
-  { h: 12, angle: 90.0, color: '#4da3d2', L: 56.28, tiers: [[0, 56.28, 11.75], [56.28, 1.69, 8.22]], peak: false },
-  { h: 13, angle: 105.0, color: '#4fa7d8', L: 58.25, tiers: [[0, 36.12, 12.47], [36.12, 22.13, 6.86]], peak: false },
-  { h: 14, angle: 120.0, color: '#51b0e2', L: 61.6, tiers: [[0, 30.8, 11.29], [30.8, 17.25, 6.77], [48.05, 13.55, 3.39]], peak: false },
-  { h: 15, angle: 135.0, color: '#52b4e8', L: 63.29, tiers: [[0, 63.29, 11.99], [63.29, 1.9, 8.39]], peak: false },
-  { h: 16, angle: 150.0, color: '#52b3e7', L: 63.05, tiers: [[0, 39.09, 12.54], [39.09, 23.96, 6.9]], peak: false },
-  { h: 17, angle: 165.0, color: '#55c0f7', L: 68.26, tiers: [[0, 34.13, 13.51], [34.13, 19.11, 8.11], [53.24, 15.02, 4.05]], peak: true },
-  { h: 18, angle: 180.0, color: '#57c7ff', L: 71.0, tiers: [[0, 71.0, 12.29], [71.0, 2.13, 8.6]], peak: true },
-  { h: 19, angle: 195.0, color: '#53b7ec', L: 64.62, tiers: [[0, 40.06, 12.38], [40.06, 24.56, 6.81]], peak: true },
-  { h: 20, angle: 210.0, color: '#51b0e3', L: 61.63, tiers: [[0, 30.81, 12.72], [30.81, 17.26, 7.63], [48.07, 13.56, 3.82]], peak: false },
-  { h: 21, angle: 225.0, color: '#52b3e6', L: 62.84, tiers: [[0, 62.84, 11.38], [62.84, 1.89, 7.97]], peak: false },
-  { h: 22, angle: 240.0, color: '#4fabdc', L: 59.52, tiers: [[0, 36.9, 11.7], [36.9, 22.62, 6.44]], peak: false },
-  { h: 23, angle: 255.0, color: '#4991bd', L: 49.18, tiers: [[0, 24.59, 11.5], [24.59, 13.77, 6.9], [38.36, 10.82, 3.45]], peak: false },
+  { h: 0, L: 38.15, tiers: [[0, 38.15, 9.52], [38.15, 1.14, 6.66]], peak: false },
+  { h: 1, L: 29.25, tiers: [[0, 18.13, 9.42], [18.13, 11.12, 5.18]], peak: false },
+  { h: 2, L: 23.45, tiers: [[0, 11.73, 9.55], [11.73, 6.57, 5.73], [18.3, 5.15, 2.87]], peak: false },
+  { h: 3, L: 19.81, tiers: [[0, 19.81, 9.85], [19.81, 0.59, 6.89]], peak: false },
+  { h: 4, L: 18.0, tiers: [[0, 11.16, 8.29], [11.16, 6.84, 4.56]], peak: false },
+  { h: 5, L: 18.45, tiers: [[0, 9.23, 8.89], [9.23, 5.17, 5.33], [14.4, 4.05, 2.67]], peak: false },
+  { h: 6, L: 25.02, tiers: [[0, 25.02, 9.96], [25.02, 0.75, 6.97]], peak: false },
+  { h: 7, L: 36.13, tiers: [[0, 22.4, 9.37], [22.4, 13.73, 5.15]], peak: false },
+  { h: 8, L: 44.95, tiers: [[0, 22.48, 10.61], [22.48, 12.59, 6.37], [35.07, 9.88, 3.18]], peak: false },
+  { h: 9, L: 47.58, tiers: [[0, 47.58, 11.38], [47.58, 1.43, 7.97]], peak: false },
+  { h: 10, L: 49.55, tiers: [[0, 30.72, 12.1], [30.72, 18.83, 6.66]], peak: false },
+  { h: 11, L: 52.5, tiers: [[0, 26.25, 10.89], [26.25, 14.7, 6.53], [40.95, 11.55, 3.27]], peak: false },
+  { h: 12, L: 56.28, tiers: [[0, 56.28, 11.75], [56.28, 1.69, 8.22]], peak: false },
+  { h: 13, L: 58.25, tiers: [[0, 36.12, 12.47], [36.12, 22.13, 6.86]], peak: false },
+  { h: 14, L: 61.6, tiers: [[0, 30.8, 11.29], [30.8, 17.25, 6.77], [48.05, 13.55, 3.39]], peak: false },
+  { h: 15, L: 63.29, tiers: [[0, 63.29, 11.99], [63.29, 1.9, 8.39]], peak: false },
+  { h: 16, L: 63.05, tiers: [[0, 39.09, 12.54], [39.09, 23.96, 6.9]], peak: false },
+  { h: 17, L: 68.26, tiers: [[0, 34.13, 13.51], [34.13, 19.11, 8.11], [53.24, 15.02, 4.05]], peak: true },
+  { h: 18, L: 71.0, tiers: [[0, 71.0, 12.29], [71.0, 2.13, 8.6]], peak: true },
+  { h: 19, L: 64.62, tiers: [[0, 40.06, 12.38], [40.06, 24.56, 6.81]], peak: true },
+  { h: 20, L: 61.63, tiers: [[0, 30.81, 12.72], [30.81, 17.26, 7.63], [48.07, 13.56, 3.82]], peak: false },
+  { h: 21, L: 62.84, tiers: [[0, 62.84, 11.38], [62.84, 1.89, 7.97]], peak: false },
+  { h: 22, L: 59.52, tiers: [[0, 36.9, 11.7], [36.9, 22.62, 6.44]], peak: false },
+  { h: 23, L: 49.18, tiers: [[0, 24.59, 11.5], [24.59, 13.77, 6.9], [38.36, 10.82, 3.45]], peak: false },
 ];
 
+const slotWidth = 15;
+const heightScale = 1.0;
+const stripWidth = slotWidth * 24;
+const groundY = 108;
+const viewW = 200;
+const viewH = 140;
+
 function windowsFor(start: number, len: number, width: number) {
-  if (len < 6 || width < 4) return [];
-  const margin = 2.4;
-  const rowGap = 4.3;
+  if (len < 5 || width < 3.5) return [];
+  const margin = 1.6;
+  const rowGap = 2.6;
   const usable = len - margin * 2;
   const rows = Math.max(1, Math.floor(usable / rowGap) + 1);
-  const halfW = width / 2 - 1.3;
-  const cols = halfW > 1.5 ? [-halfW * 0.55, halfW * 0.55] : [0];
+  const halfW = width / 2 - 1;
+  const colGap = 2;
+  const cols: number[] = [];
+  if (halfW > 3) {
+    for (let c = -halfW + 1; c <= halfW - 1; c += colGap) cols.push(c);
+  } else if (halfW > 1) {
+    cols.push(-halfW * 0.55, halfW * 0.55);
+  } else {
+    cols.push(0);
+  }
   const pts: { x: number; y: number }[] = [];
   for (let r = 0; r < rows; r++) {
     const d = rows === 1 ? usable / 2 : (usable * r) / (rows - 1);
     for (const c of cols) {
-      pts.push({ x: r0 + start + margin + d, y: c });
+      pts.push({ x: start + margin + d, y: c });
     }
   }
   return pts;
 }
 
-// Dégradé continu sur 24h (nuit bleu-ardoise -> aube -> matin pêche -> jour neutre -> soir ambre -> crépuscule violet -> nuit).
-// Interpolé heure par heure entre des ancres, pas de blocs francs : la teinte glisse en douceur d'une heure à l'autre.
-const hourColors = [
-  '#3d4356', '#3c4153', '#3b4050', '#3a3e4d', '#393c4a', '#525061',
-  '#6b6478', '#8a8086', '#a89d94', '#a49c95', '#a19c97', '#9d9b98',
-  '#9f9d9b', '#a1a09d', '#a3a2a0', '#a39a94', '#a39387', '#a38b7b',
-  '#9e8476', '#997d70', '#846e74', '#6f5f78', '#60546e', '#504965',
-];
-
-function grayFor(h: number) {
-  return hourColors[h % 24];
-}
-
-const glassPalette = ['#303b40', '#373b3e', '#494e51', '#34393c'];
-const glassFor = (h: number) => glassPalette[(h + 2) % glassPalette.length];
-
-// Probabilité de fenêtres allumées par heure : beaucoup la nuit, un peu à l'aube/au crépuscule, rien en journée
-// (les lumières intérieures ne se voient pas en plein jour). Basé sur le moment, pas sur le volume de courses.
-const nightProb = [
-  0.55, 0.6, 0.65, 0.65, 0.55, 0.4, // 0h-5h : nuit
-  0.25, 0.15, 0.08, 0.04, // 6h-9h : matin
-  0, 0, 0, 0, 0, 0, 0, // 10h-16h : journée
-  0.04, 0.08, 0.15, 0.22, // 17h-20h : soir
-  0.3, 0.4, 0.5, // 21h-23h : soirée
-];
-
-// Hash déterministe (pas de random réel : même rendu à chaque build) pour décider quelles fenêtres sont allumées.
 function hashUnit(seed: number) {
   const x = Math.sin(seed) * 43758.5453;
   return x - Math.floor(x);
 }
 
-function isLit(h: number, x: number, y: number) {
-  const prob = nightProb[h % 24];
-  const roll = hashUnit(h * 12.9898 + x * 3.71 + y * 7.13);
-  return roll < prob;
+// Fenêtres "candidates lumière" : un sous-ensemble fixe de toutes les fenêtres de la scène.
+// Chacune reçoit un palier (a = large plage soir/nuit, b = plage moyenne, c = cœur de nuit) — éteint
+// (bleu) le jour, allumé net (jaune, pas de fondu) sur sa plage horaire. Paliers décalés des deux
+// côtés (entrée en soirée ET sortie le matin), pour que l'allumage ET l'extinction soient progressifs.
+const lightTiers = ['a', 'b', 'c'];
+function lightTierFor(buildingIndex: number, x: number, y: number) {
+  const roll = hashUnit(buildingIndex * 12.9898 + x * 3.71 + y * 7.13);
+  if (roll >= 0.55) return null;
+  const tierRoll = hashUnit(buildingIndex * 51.17 + x * 8.24 + y * 2.13);
+  return lightTiers[Math.floor(tierRoll * lightTiers.length)];
 }
+
+type BuildingTier = [number, number, number];
+
+const bodies: { x: number; y: number; w: number; h: number }[] = [];
+const windows: { x: number; y: number; tier: string | null }[] = [];
+const spires: { x: number; y1: number; y2: number }[] = [];
+const hourLabels: { x: number; h: number }[] = [];
+
+buildings.forEach((b, i) => {
+  const xCenter = i * slotWidth + slotWidth / 2;
+  (b.tiers as BuildingTier[]).forEach(([start, len, width]) => {
+    const s = start * heightScale;
+    const l = len * heightScale;
+    bodies.push({ x: xCenter - width / 2, y: groundY - s - l, w: width, h: l });
+    windowsFor(s, l, width).forEach((p) => {
+      if (hashUnit(i * 33.71 + p.x * 5.19 + p.y * 9.02) < 0.12) return;
+      windows.push({ x: xCenter + p.y, y: groundY - p.x, tier: lightTierFor(i, p.x, p.y) });
+    });
+  });
+  if (b.peak) {
+    spires.push({ x: xCenter, y1: groundY - b.L * heightScale, y2: groundY - b.L * heightScale - 9 });
+  }
+  if (b.h % 2 === 0) {
+    hourLabels.push({ x: xCenter, h: b.h });
+  }
+});
+
+const axisTopY = groundY - 71 * heightScale;
 ---
 
 <div class="taxi-clock">
-  <svg viewBox="0 0 240 240" role="img" aria-label="Courses de taxi par heure à New York — pic vers 18h, creux vers 4h du matin">
-    <circle class="ring-outer" cx="120" cy="120" r="115" />
-    <circle class="ring-inner" cx="120" cy="120" r="36" />
+  <svg viewBox={`0 0 ${viewW} ${viewH}`} role="img" aria-label="Courses de taxi par heure à New York — pic vers 18h, creux vers 4h du matin">
+    <defs>
+      <linearGradient id="edgeFadeGrad" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0.08" stop-color="#fff" stop-opacity="1" />
+        <stop offset="0.92" stop-color="#fff" stop-opacity="1" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
+      <mask id="edgeFade" maskUnits="userSpaceOnUse" x="0" y="0" width={viewW} height={viewH}>
+        <rect x="0" y="0" width={viewW} height={viewH} fill="url(#edgeFadeGrad)" />
+      </mask>
+    </defs>
 
-    {buildings.map((b) => {
-      const bodyColor = grayFor(b.h);
-      return (
-        <g class="building" transform={`translate(120 120) rotate(${b.angle})`}>
-          {b.tiers.map(([start, len, width]) => (
-            <rect class="building-body" fill={bodyColor} x={r0 + start} y={-width / 2} width={len} height={width} />
-          ))}
+    <g mask="url(#edgeFade)">
+      <rect class={night ? 'road road-live' : 'road'} x="0" y={groundY} width={stripWidth * 3} height="6" />
+      <line class="road-line" x1="0" y1={groundY + 3} x2={stripWidth * 3} y2={groundY + 3} />
 
-          {b.tiers.map(([start, len, width]) =>
-            windowsFor(start, len, width).map((p) => {
-              const lit = night && isLit(b.h, p.x, p.y);
-              return (
-                <circle
-                  class={lit ? 'window window-lit' : 'window'}
-                  fill={lit ? undefined : glassFor(b.h)}
-                  cx={p.x}
-                  cy={p.y}
-                  r="0.55"
-                />
-              );
-            })
-          )}
+      <g class="skyline-scroll">
+        {[0, 1, 2].map((rep) => (
+          <g transform={`translate(${rep * stripWidth} 0)`}>
+            {bodies.map((r) => (
+              <rect class={night ? 'building-body building-body-live' : 'building-body'} x={r.x} y={r.y} width={r.w} height={r.h} />
+            ))}
+            {windows.map((w) => (
+              <>
+                <rect class="window" x={w.x - 0.7} y={w.y - 0.7} width="1.4" height="1.4" />
+                {night && w.tier && (
+                  <rect class={`window-lit window-lit-${w.tier}`} x={w.x - 0.7} y={w.y - 0.7} width="1.4" height="1.4" />
+                )}
+              </>
+            ))}
+            {spires.map((s) => (
+              <line class="spire" x1={s.x} y1={s.y1} x2={s.x} y2={s.y2} />
+            ))}
+            {hourLabels.map((hl) => (
+              <text class="hour-label" x={hl.x} y={groundY + 12}>{hl.h}h</text>
+            ))}
+          </g>
+        ))}
+      </g>
+    </g>
 
-          {b.peak && <line class="spire" stroke={bodyColor} x1={r0 + b.L} y1="0" x2={r0 + b.L + 9} y2="0" />}
-        </g>
-      );
-    })}
+    <g class="axis">
+      <line class="axis-line" x1="3" y1={groundY} x2="3" y2={axisTopY} />
+      <line class="axis-tick" x1="1.5" y1={groundY} x2="4.5" y2={groundY} />
+      <text class="axis-label" x="6" y={groundY + 1.5}>0</text>
+      <line class="axis-tick" x1="1.5" y1={axisTopY} x2="4.5" y2={axisTopY} />
+      <text class="axis-label" x="6" y={axisTopY + 1.5}>5M courses/h</text>
+    </g>
+
+    <image class="taxi" href="/img/taxi-pixel.png" x={viewW / 2 - 6} y={groundY - 5} width="12" height="7" />
   </svg>
 </div>
 
 <style>
   .taxi-clock {
-    position: absolute;
-    inset: -60px 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .taxi-clock svg {
-    transform: translateX(17%);
+    width: 100%;
+    height: 100%;
   }
 
-  .ring-outer,
-  .ring-inner {
-    fill: none;
-    stroke: var(--border);
-    stroke-width: 1;
+  .road {
+    fill: #22262b;
   }
 
-  .ring-inner {
-    stroke: color-mix(in srgb, var(--accent) 25%, var(--border));
+  .road-line {
+    stroke: #e8dfae;
+    stroke-width: 0.7;
+    stroke-dasharray: 5 5;
+    opacity: 0.75;
+    animation: road-dash 40s linear infinite;
+  }
+
+  @keyframes road-dash {
+    to {
+      stroke-dashoffset: 360;
+    }
+  }
+
+  .road-live {
+    animation: road-tint-drift 40s linear infinite;
+    animation-delay: -10s;
+  }
+
+  @keyframes road-tint-drift {
+    0.0% { fill: #212841; }
+    4.1667% { fill: #21283f; }
+    8.3333% { fill: #22293e; }
+    12.5% { fill: #23283d; }
+    16.6667% { fill: #24283c; }
+    20.8333% { fill: #2b293c; }
+    25.0% { fill: #322c3e; }
+    29.1667% { fill: #3c3339; }
+    33.3333% { fill: #473a2f; }
+    37.5% { fill: #433a32; }
+    41.6667% { fill: #403a35; }
+    45.8333% { fill: #3d3b38; }
+    50.0% { fill: #3d3b38; }
+    54.1667% { fill: #3d3c39; }
+    58.3333% { fill: #3d3c3a; }
+    62.5% { fill: #433932; }
+    66.6667% { fill: #48382b; }
+    70.8333% { fill: #4d3525; }
+    75.0% { fill: #4b3326; }
+    79.1667% { fill: #4a3126; }
+    83.3333% { fill: #402d32; }
+    87.5% { fill: #382941; }
+    91.6667% { fill: #322641; }
+    95.8333% { fill: #2b2342; }
+    100% { fill: #212841; }
+  }
+
+  .skyline-scroll {
+    animation: skyline-drift 40s linear infinite;
+  }
+
+  @keyframes skyline-drift {
+    to {
+      transform: translateX(-360px);
+    }
+  }
+
+  .building-body {
+    fill: #8c8c90;
+    stroke: #55555a;
+    stroke-width: 0.5;
+    stroke-linejoin: round;
+  }
+
+  .building-body-live {
+    animation: scene-tint-drift 40s linear infinite;
+    animation-delay: -10s;
+  }
+
+  @keyframes scene-tint-drift {
+    0.0% { fill: #1e2f66; }
+    4.1667% { fill: #1f2d61; }
+    8.3333% { fill: #202e5c; }
+    12.5% { fill: #212c57; }
+    16.6667% { fill: #222a52; }
+    20.8333% { fill: #3e386a; }
+    25.0% { fill: #5d4984; }
+    29.1667% { fill: #8e6d81; }
+    33.3333% { fill: #b99374; }
+    37.5% { fill: #af937b; }
+    41.6667% { fill: #a69483; }
+    45.8333% { fill: #9b958a; }
+    50.0% { fill: #9c958e; }
+    54.1667% { fill: #9e9b90; }
+    58.3333% { fill: #9f9c95; }
+    62.5% { fill: #ae8f7a; }
+    66.6667% { fill: #bd865d; }
+    70.8333% { fill: #cc7a43; }
+    75.0% { fill: #c76e3e; }
+    79.1667% { fill: #c0643a; }
+    83.3333% { fill: #925062; }
+    87.5% { fill: #6e3f89; }
+    91.6667% { fill: #563380; }
+    95.8333% { fill: #3b2678; }
+    100% { fill: #1e2f66; }
   }
 
   .window {
-    opacity: 0.85;
+    fill: #2a4258;
+    opacity: 0.95;
   }
 
   .window-lit {
     fill: var(--accent-gold);
-    opacity: 0.95;
+    animation-duration: 40s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-delay: -10s;
+  }
+
+  .window-lit-a { animation-name: window-glow-a; }
+  .window-lit-b { animation-name: window-glow-b; }
+  .window-lit-c { animation-name: window-glow-c; }
+
+  @keyframes window-glow-a {
+    0% { opacity: 0.95; }
+    29.1167% { opacity: 0.95; }
+    29.1667% { opacity: 0; }
+    79.1167% { opacity: 0; }
+    79.1667% { opacity: 0.95; }
+    100% { opacity: 0.95; }
+  }
+
+  @keyframes window-glow-b {
+    0% { opacity: 0.95; }
+    20.7833% { opacity: 0.95; }
+    20.8333% { opacity: 0; }
+    87.45% { opacity: 0; }
+    87.5% { opacity: 0.95; }
+    100% { opacity: 0.95; }
+  }
+
+  @keyframes window-glow-c {
+    0% { opacity: 0.95; }
+    12.45% { opacity: 0.95; }
+    12.5% { opacity: 0; }
+    95.7833% { opacity: 0; }
+    95.8333% { opacity: 0.95; }
+    100% { opacity: 0.95; }
   }
 
   .spire {
+    stroke: #6b6b70;
     stroke-width: 1.2;
+  }
+
+  .axis-line,
+  .axis-tick {
+    stroke: var(--fg-muted);
+    stroke-width: 0.4;
+    opacity: 0.5;
+  }
+
+  .axis-label {
+    font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+    font-size: 4px;
+    fill: var(--fg-muted);
+    opacity: 0.75;
+  }
+
+  .hour-label {
+    font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+    font-size: 3.2px;
+    font-weight: 400;
+    fill: var(--fg-muted);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    opacity: 0.65;
+  }
+
+  .taxi {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    animation: taxi-daynight 40s linear infinite;
+    animation-delay: -10s;
+  }
+
+  @keyframes taxi-daynight {
+    0.0% { filter: brightness(0.78) saturate(1.15); }
+    4.1667% { filter: brightness(0.76) saturate(1.15); }
+    8.3333% { filter: brightness(0.74) saturate(1.15); }
+    12.5% { filter: brightness(0.74) saturate(1.15); }
+    16.6667% { filter: brightness(0.78) saturate(1.15); }
+    20.8333% { filter: brightness(0.84) saturate(1.15); }
+    25.0% { filter: brightness(0.9) saturate(1.15); }
+    29.1667% { filter: brightness(0.94) saturate(1.15); }
+    33.3333% { filter: brightness(0.968) saturate(1.15); }
+    37.5% { filter: brightness(0.984) saturate(1.15); }
+    41.6667% { filter: brightness(1.0) saturate(1.15); }
+    45.8333% { filter: brightness(1.0) saturate(1.15); }
+    50.0% { filter: brightness(1.0) saturate(1.15); }
+    54.1667% { filter: brightness(1.0) saturate(1.15); }
+    58.3333% { filter: brightness(1.0) saturate(1.15); }
+    62.5% { filter: brightness(1.0) saturate(1.15); }
+    66.6667% { filter: brightness(1.0) saturate(1.15); }
+    70.8333% { filter: brightness(0.984) saturate(1.15); }
+    75.0% { filter: brightness(0.968) saturate(1.15); }
+    79.1667% { filter: brightness(0.94) saturate(1.15); }
+    83.3333% { filter: brightness(0.912) saturate(1.15); }
+    87.5% { filter: brightness(0.88) saturate(1.15); }
+    91.6667% { filter: brightness(0.84) saturate(1.15); }
+    95.8333% { filter: brightness(0.8) saturate(1.15); }
+    100% { filter: brightness(0.78) saturate(1.15); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skyline-scroll,
+    .building-body-live,
+    .road-live,
+    .road-line,
+    .taxi,
+    .window-lit {
+      animation: none;
+    }
   }
 </style>
