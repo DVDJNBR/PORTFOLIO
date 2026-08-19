@@ -176,6 +176,14 @@ const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
         }
       }
 
+      .sphere-1,
+      .sphere-2,
+      .sphere-3,
+      .shadow-orb-1,
+      .shadow-orb-2 {
+        animation: none;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .sphere-1,
         .sphere-2,
@@ -188,13 +196,7 @@ const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
     </style>
   </head>
   <body>
-    <div class="ambient-bg" aria-hidden="true">
-      <span class="shadow-orb shadow-orb-1"></span>
-      <span class="shadow-orb shadow-orb-2"></span>
-      <span class="gradient-sphere sphere-1"></span>
-      <span class="gradient-sphere sphere-2"></span>
-      <span class="gradient-sphere sphere-3"></span>
-    </div>
+    <div class="ambient-bg" aria-hidden="true"></div>
     <slot />
   </body>
 </html>
