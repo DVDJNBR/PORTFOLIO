@@ -457,8 +457,6 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     fill: none;
     stroke: color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 55%, white);
     stroke-linecap: round;
-    stroke-dasharray: 12 88;
-    animation: none;
   }
 
   .thumb-glow-blur {
@@ -471,12 +469,6 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     stroke-width: 1.4;
   }
 
-  @keyframes thumb-glow-travel {
-    to {
-      stroke-dashoffset: -100;
-    }
-  }
-
   .select-cell.is-glowing .thumb-glow {
     opacity: 1;
   }
@@ -485,6 +477,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     width: 130%;
     height: 100%;
     object-fit: cover;
+    image-rendering: pixelated;
   }
 
   .select-thumb-fallback {
