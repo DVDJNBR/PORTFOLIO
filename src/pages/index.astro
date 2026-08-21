@@ -156,24 +156,8 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                   aria-selected={i === 0 ? 'true' : 'false'}
                   style={entry.data.accent ? `--cell-glow: ${entry.data.accent};` : undefined}
                 >
-                  <span class="select-thumb">
-                    <span class="select-thumb-clip">
-                      <span class="select-thumb-fill">
-                        {(() => {
-                          const icon = projectAssets[entry.id]?.icon;
-                          return icon ? (
-                            <img src={icon} alt="" />
-                          ) : (
-                            <span class="select-thumb-fallback">{entry.data.title.charAt(0)}</span>
-                          );
-                        })()}
-                      </span>
-                    </span>
-                    <svg class="thumb-glow" viewBox="0 0 36 68" preserveAspectRatio="none" aria-hidden="true">
-                      <polygon points="5.04,0 36,0 30.96,68 0,68" pathLength="100" class="thumb-glow-blur"></polygon>
-                      <polygon points="5.04,0 36,0 30.96,68 0,68" pathLength="100" class="thumb-glow-line"></polygon>
-                    </svg>
-                  </span>
+                  <span class="select-cell-glow" aria-hidden="true"></span>
+                  <span class="select-cell-name">{entry.data.title}</span>
                 </button>
               ))}
             </div>
@@ -348,10 +332,9 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
 
   .select-grid {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0;
-    height: 72px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   @media (max-width: 420px) {
@@ -378,99 +361,47 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
   .select-cell {
     position: relative;
     display: flex;
-    flex-shrink: 0;
+    align-items: center;
+    gap: 0.6rem;
     background: none;
     border: none;
-    padding: 0;
+    padding: 0.15rem 0;
     cursor: pointer;
     font: inherit;
-    color: inherit;
-  }
-
-  .select-thumb {
-    position: relative;
-    z-index: 0;
-    width: 36px;
-    height: 68px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.35s var(--ease-apple);
-  }
-
-  .select-thumb-clip {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
-    background: var(--border);
-    box-shadow: var(--shadow-sm);
-    transition: background-color 0.25s var(--ease-apple);
-  }
-
-  .select-cell.is-glowing .select-thumb-clip {
-    background: var(--cell-glow, var(--accent-gold));
-  }
-
-  .select-thumb-fill {
-    position: absolute;
-    inset: 1px;
-    overflow: hidden;
-    background: var(--elevated);
-    clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .thumb-glow {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.25s var(--ease-apple);
-  }
-
-  .thumb-glow-blur,
-  .thumb-glow-line {
-    fill: none;
-    stroke: color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 55%, white);
-    stroke-linecap: round;
-  }
-
-  .thumb-glow-blur {
-    stroke-width: 5;
-    filter: blur(3px);
-    opacity: 0.65;
-  }
-
-  .thumb-glow-line {
-    stroke-width: 1.4;
-  }
-
-  .select-cell.is-glowing .thumb-glow {
-    opacity: 1;
-  }
-
-  .select-thumb-fill img {
-    width: 130%;
-    height: 100%;
-    object-fit: cover;
-    image-rendering: pixelated;
-  }
-
-  .select-thumb-fallback {
-    font-size: 1.1rem;
-    font-weight: 700;
     color: var(--fg-muted);
+    text-align: left;
+    transition: color 0.25s var(--ease-apple);
   }
 
-  .select-cell[aria-selected='true'] {
-    z-index: 1;
+  .select-cell-glow {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--cell-glow, var(--accent-gold));
+    opacity: 0.3;
+    box-shadow: 0 0 0 0 var(--cell-glow, var(--accent-gold));
+    transition: opacity 0.25s var(--ease-apple), box-shadow 0.25s var(--ease-apple);
+  }
+
+  .select-cell-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .select-cell.is-glowing {
+    color: var(--fg);
+  }
+
+  .select-cell.is-glowing .select-cell-glow {
+    opacity: 1;
+    box-shadow: 0 0 10px 2px var(--cell-glow, var(--accent-gold));
+  }
+
+  .select-cell.is-glowing .select-cell-name {
+    text-shadow: 0 0 18px color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 55%, transparent);
   }
 
   .detail-stage {
@@ -508,24 +439,12 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       });
     };
 
-    const applyWave = (focusIndex: number) => {
-      cells.forEach((cell, i) => {
-        const thumb = cell.querySelector('.select-thumb') as HTMLElement | null;
-        if (!thumb) return;
-        const dist = Math.min(Math.abs(i - focusIndex), 4);
-        const lift = Math.max(0, 4 - dist) * 3;
-        const scale = 1 - dist * 0.05;
-        thumb.style.transform = `translateY(-${lift}px) scale(${Math.max(scale, 0.82)})`;
-      });
-    };
-
     const select = (index: number) => {
       confirmedIndex = index;
       cells.forEach((cell) => {
         cell.setAttribute('aria-selected', String(Number(cell.dataset.index) === index));
       });
       showSlot(index);
-      applyWave(index);
     };
 
     cells.forEach((cell) => {
@@ -533,16 +452,13 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
         select(Number(cell.dataset.index));
       });
       cell.addEventListener('mouseenter', () => {
-        const i = Number(cell.dataset.index);
-        showSlot(i);
-        applyWave(i);
+        showSlot(Number(cell.dataset.index));
       });
     });
 
     const grid = document.querySelector('.select-grid');
     grid?.addEventListener('mouseleave', () => {
       showSlot(confirmedIndex);
-      applyWave(confirmedIndex);
     });
 
     select(0);
