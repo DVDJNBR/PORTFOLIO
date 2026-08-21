@@ -38,31 +38,8 @@ function splitAssets(named: { name: string; url: string }[]): ProjectAssets {
   return { icon, backdrop, depth };
 }
 
-async function fetchGithubAssets(repo: string): Promise<ProjectAssets> {
-  try {
-    const res = await fetch(`https://api.github.com/repos/${repo}/contents/assets`, {
-      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'portfolio-build' },
-    });
-    if (!res.ok) return { icon: null, backdrop: null, depth: null };
-
-    const files: { name: string; type: string; download_url: string }[] = await res.json();
-    const named = files
-      .filter((f) => f.type === 'file' && /\.(png|jpe?g|webp|avif|gif)$/i.test(f.name))
-      .map((f) => ({ name: f.name, url: f.download_url }));
-
-    return splitAssets(named);
-  } catch {
-    return { icon: null, backdrop: null, depth: null };
-  }
-}
-
 const projectAssets: Record<string, ProjectAssets> = {};
 for (const entry of entries) {
-  if (entry.data.githubRepo) {
-    projectAssets[entry.id] = await fetchGithubAssets(entry.data.githubRepo);
-    continue;
-  }
-
   const folder = entry.id.split('/')[0];
   const matches = Object.entries(allImages).filter(([p]) => p.includes(`/projects/${folder}/assets/`));
 
