@@ -216,6 +216,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                           type="button"
                           class="roulette-item"
                           data-index={i}
+                          data-accent={entry.data.accent}
                           role="option"
                           aria-selected={i === 0 ? 'true' : 'false'}
                         >
@@ -703,13 +704,14 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     height: 2.3rem;
     transform: translateY(-50%);
     border-radius: 8px;
-    border-left: 2px solid var(--accent-gold);
+    border-left: 2px solid var(--marker-accent, var(--accent-gold));
     background: linear-gradient(
       to right,
-      color-mix(in srgb, var(--accent-gold) 12%, transparent),
+      color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 12%, transparent),
       transparent 70%
     );
-    box-shadow: 0 0 14px -4px color-mix(in srgb, var(--accent-gold) 65%, transparent);
+    box-shadow: 0 0 14px -4px color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 65%, transparent);
+    transition: border-color 0.25s var(--ease-apple), box-shadow 0.25s var(--ease-apple);
     z-index: 0;
     pointer-events: none;
   }
@@ -776,10 +778,10 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       width: 4.5rem;
       transform: translateX(-50%);
       border-left: none;
-      border-top: 2px solid var(--accent-gold);
+      border-top: 2px solid var(--marker-accent, var(--accent-gold));
       background: linear-gradient(
         to bottom,
-        color-mix(in srgb, var(--accent-gold) 12%, transparent),
+        color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 12%, transparent),
         transparent 70%
       );
     }
@@ -829,6 +831,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     const slots = Array.from(document.querySelectorAll('.detail-slot')) as HTMLElement[];
     const rouletteTrack = document.querySelector('.roulette-scroll') as HTMLElement | null;
     const rouletteTrackInner = document.querySelector('.roulette-track') as HTMLElement | null;
+    const marker = document.querySelector('.roulette-marker') as HTMLElement | null;
 
     if (slots.length > 0) {
       // Vertical padding-percentage resolves against the container's WIDTH
@@ -843,7 +846,11 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
 
       const select = (index: number) => {
         cells.forEach((cell) => {
-          cell.setAttribute('aria-selected', String(Number(cell.dataset.index) === index));
+          const isSelected = Number(cell.dataset.index) === index;
+          cell.setAttribute('aria-selected', String(isSelected));
+          if (isSelected && marker && cell.dataset.accent) {
+            marker.style.setProperty('--marker-accent', cell.dataset.accent);
+          }
         });
         slots.forEach((slot) => {
           slot.classList.toggle('is-active', Number(slot.dataset.index) === index);

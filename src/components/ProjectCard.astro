@@ -113,8 +113,8 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
     bottom: 0;
     width: 2px;
     z-index: 2;
-    background: linear-gradient(to bottom, transparent, var(--accent-gold), transparent);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-gold) 80%, transparent);
+    background: linear-gradient(to bottom, transparent, var(--cell-glow, var(--accent-gold)), transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 80%, transparent);
     animation: panel-beam 0.35s var(--ease-apple) forwards;
   }
 
