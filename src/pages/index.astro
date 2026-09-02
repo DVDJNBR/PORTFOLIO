@@ -224,7 +224,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                       ))}
                     </div>
                   </div>
-                  <span class="roulette-marker" aria-hidden="true">▸</span>
+                  <span class="roulette-marker" aria-hidden="true"></span>
                 </div>
 
                 <div class="detail-stage" data-reveal="right">
@@ -239,24 +239,27 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                         depth={projectAssets[entry.id]?.depth}
                         accent={entry.data.accent}
                       >
-                        {entry.id.startsWith('nyc-taxi') && (
-                          <Fragment slot="visual">
-                            <img
-                              src="/img/nyc-taxi-chart.png"
-                              alt="Courses de taxi par heure à New York"
-                              style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform:perspective(1400px) rotateY(-7deg); transform-origin:right center; z-index:1;"
-                            />
-                          </Fragment>
-                        )}
-                        {entry.id.startsWith('watt-watcher') && (
-                          <Fragment slot="visual">
-                            <img
-                              src="/img/watt-watcher-chart.png"
-                              alt="Mix électrique français sur une semaine"
-                              style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform:perspective(1400px) rotateY(-7deg); transform-origin:right center; z-index:1;"
-                            />
-                          </Fragment>
-                        )}
+                        {/* Always an explicit Fragment, never a bare conditional — Astro
+                            decides whether the "visual" slot is filled per-component, not
+                            per-render, so a conditional fragment that resolves to nothing
+                            still counts as "filled" and silently kills ProjectCard's own
+                            fallback (backdrop/depth) for every other project in this loop. */}
+                        <Fragment slot="visual">
+                          {entry.id.startsWith('nyc-taxi') ? (
+                            <img src="/img/nyc-taxi-chart.png" alt="Courses de taxi par heure à New York" class="silhouette" />
+                          ) : entry.id.startsWith('watt-watcher') ? (
+                            <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette" />
+                          ) : (
+                            <>
+                              {projectAssets[entry.id]?.depth && (
+                                <img src={projectAssets[entry.id].depth} alt="" class="silhouette-depth" />
+                              )}
+                              {projectAssets[entry.id]?.backdrop && (
+                                <img src={projectAssets[entry.id].backdrop} alt="" class="silhouette" />
+                              )}
+                            </>
+                          )}
+                        </Fragment>
                       </ProjectCard>
                     </div>
                   ))}
@@ -695,12 +698,19 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
   .roulette-marker {
     position: absolute;
     top: 50%;
-    left: 0;
+    left: -0.5rem;
+    right: -0.5rem;
+    height: 2.3rem;
     transform: translateY(-50%);
-    color: var(--accent-blue);
-    font-size: 0.85rem;
-    line-height: 1;
-    z-index: 1;
+    border-radius: 8px;
+    border-left: 2px solid var(--accent-gold);
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--accent-gold) 12%, transparent),
+      transparent 70%
+    );
+    box-shadow: 0 0 14px -4px color-mix(in srgb, var(--accent-gold) 65%, transparent);
+    z-index: 0;
     pointer-events: none;
   }
 
@@ -758,9 +768,20 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       scroll-snap-type: x mandatory;
     }
     .roulette-marker {
-      top: 0;
+      top: -0.5rem;
+      bottom: -0.5rem;
       left: 50%;
-      transform: translateX(-50%) rotate(-90deg);
+      right: auto;
+      height: auto;
+      width: 4.5rem;
+      transform: translateX(-50%);
+      border-left: none;
+      border-top: 2px solid var(--accent-gold);
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--accent-gold) 12%, transparent),
+        transparent 70%
+      );
     }
     .roulette-track {
       flex-direction: row;
@@ -799,8 +820,11 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // ── Project selector (niveau 2) — vertical roulette; whichever item
-    // scrolls past the center marker becomes the selection. ─────────────
+    // ── Project selector (niveau 2) — click a name, its panel shows. The
+    // list also scrolls the clicked item to center for visual polish, but
+    // that scroll is cosmetic only — selection itself is direct, not
+    // inferred from scroll position (a short list that already fits on
+    // screen never scrolls, which used to mean the panel never updated). ──
     const cells = Array.from(document.querySelectorAll('.roulette-item')) as HTMLButtonElement[];
     const slots = Array.from(document.querySelectorAll('.detail-slot')) as HTMLElement[];
     const rouletteTrack = document.querySelector('.roulette-scroll') as HTMLElement | null;
@@ -817,21 +841,18 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
         rouletteTrackInner.style.paddingBottom = `${pad}px`;
       }
 
-      const showSlot = (index: number) => {
+      const select = (index: number) => {
+        cells.forEach((cell) => {
+          cell.setAttribute('aria-selected', String(Number(cell.dataset.index) === index));
+        });
         slots.forEach((slot) => {
           slot.classList.toggle('is-active', Number(slot.dataset.index) === index);
         });
       };
 
-      const select = (index: number) => {
-        cells.forEach((cell) => {
-          cell.setAttribute('aria-selected', String(Number(cell.dataset.index) === index));
-        });
-        showSlot(index);
-      };
-
       cells.forEach((cell) => {
         cell.addEventListener('click', () => {
+          select(Number(cell.dataset.index));
           // Scroll only the roulette itself (not scrollIntoView, which can
           // bubble to ancestor scroll containers like the level track).
           if (!rouletteTrack) return;
@@ -842,25 +863,34 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
         });
       });
 
+      // Scrolling/dragging the list also changes the selection — whichever
+      // item is closest to the marker once scrolling settles wins. Simple
+      // "closest wins" on scroll-end, not a live threshold watch, so it
+      // can't silently stop firing the way the old IntersectionObserver did.
       if (rouletteTrack) {
-        const isMobile = window.matchMedia('(max-width: 700px)').matches;
-        const centerObserver = new IntersectionObserver(
-          (obsEntries) => {
-            obsEntries.forEach((obsEntry) => {
-              if (obsEntry.isIntersecting) {
-                select(Number((obsEntry.target as HTMLElement).dataset.index));
+        let scrollSettleTimer: ReturnType<typeof setTimeout>;
+        rouletteTrack.addEventListener('scroll', () => {
+          clearTimeout(scrollSettleTimer);
+          scrollSettleTimer = setTimeout(() => {
+            const isMobile = window.matchMedia('(max-width: 700px)').matches;
+            const trackCenter = isMobile
+              ? rouletteTrack.scrollLeft + rouletteTrack.clientWidth / 2
+              : rouletteTrack.scrollTop + rouletteTrack.clientHeight / 2;
+            let closest = cells[0];
+            let closestDist = Infinity;
+            cells.forEach((cell) => {
+              const cellCenter = isMobile
+                ? cell.offsetLeft + cell.clientWidth / 2
+                : cell.offsetTop + cell.clientHeight / 2;
+              const dist = Math.abs(cellCenter - trackCenter);
+              if (dist < closestDist) {
+                closestDist = dist;
+                closest = cell;
               }
             });
-          },
-          {
-            root: rouletteTrack,
-            // A thin band dead-center — vertical roulette on desktop,
-            // rotated to horizontal on mobile.
-            rootMargin: isMobile ? '0px -48% 0px -48%' : '-48% 0px -48% 0px',
-            threshold: 0.6,
-          }
-        );
-        cells.forEach((cell) => centerObserver.observe(cell));
+            select(Number(closest.dataset.index));
+          }, 120);
+        });
       }
 
       select(0);
