@@ -125,7 +125,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       <!-- ── Niveau 1 — Présentation ─────────────────────────────────── -->
       <section class="level level-presentation" data-level="0">
         <div class="presentation-inner">
-          <div class="presentation-card-wrap" data-reveal="left">
+          <div class="presentation-card-wrap">
             <div class="presentation-card">
             <span class="kicker">Portfolio</span>
             <div class="name-row">
@@ -185,7 +185,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
             </div>
           </div>
 
-          <div class="tags-panel" data-reveal="right">
+          <div class="tags-panel">
             {tagRows.map((row) => (
               <div class="tags-row">
                 {row.map((tag) => (
