@@ -15,14 +15,23 @@ const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
     {preloadImages.map((url) => <link rel="preload" as="image" href={url} />)}
     <style is:global>
       :root {
-        --bg: #0a1628;
-        --surface: #0d1119;
-        --elevated: #131826;
-        --fg: #f2f4f8;
-        --fg-muted: #8b95a5;
-        --accent: #57c7ff;
-        --accent-gold: #f4c542;
-        --border: rgba(255, 255, 255, 0.1);
+        /* Warm near-black base (not navy). Default text is neutral gray —
+           the CV's beige/khaki is a deliberate small accent (kicker, tags,
+           per-project glows), not the everyday reading color, plus a soft
+           blue accent for interactive touches (hover, active states) so the
+           palette has two small points of color instead of one that's
+           everywhere. */
+        --bg: #14120f;
+        --surface: #19191a;
+        --elevated: #212122;
+        --fg: #d6d3ce;
+        --fg-muted: #8f8c86;
+        --accent: #c9a876;
+        --accent-blue: #6fa3d8;
+        --accent-gold: #d4b483;
+        --accent-klein: #002fa7;
+        --accent-orange: #e8823f;
+        --border: rgba(214, 211, 206, 0.1);
         --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
         --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.45);
         --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
@@ -55,143 +64,8 @@ const { title = 'dvdjnbr — Portfolio', preloadImages = [] } = Astro.props;
         position: fixed;
         inset: 0;
         z-index: -1;
-        overflow: hidden;
         pointer-events: none;
         background: var(--bg);
-      }
-
-      .gradient-sphere {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        border-radius: 50%;
-        filter: blur(60px);
-      }
-
-      .sphere-1 {
-        width: 34vw;
-        height: 34vw;
-        margin: -17vw 0 0 -17vw;
-        background: linear-gradient(
-          40deg,
-          color-mix(in srgb, var(--accent) 48%, transparent),
-          color-mix(in srgb, var(--accent) 4%, transparent)
-        );
-        animation: orbit-1 26s linear infinite;
-      }
-
-      .sphere-2 {
-        width: 36vw;
-        height: 36vw;
-        margin: -18vw 0 0 -18vw;
-        background: linear-gradient(
-          240deg,
-          color-mix(in srgb, var(--accent) 40%, #001a3d),
-          color-mix(in srgb, var(--accent) 4%, transparent)
-        );
-        animation: orbit-2 34s linear infinite reverse;
-      }
-
-      .sphere-3 {
-        width: 26vw;
-        height: 26vw;
-        margin: -13vw 0 0 -13vw;
-        background: linear-gradient(
-          120deg,
-          color-mix(in srgb, var(--accent) 35%, white),
-          color-mix(in srgb, var(--accent) 3%, transparent)
-        );
-        animation: orbit-3 20s linear infinite;
-      }
-
-      .shadow-orb {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        border-radius: 50%;
-        filter: blur(60px);
-        background: radial-gradient(
-          circle,
-          color-mix(in srgb, var(--bg) 55%, black) 0%,
-          transparent 75%
-        );
-      }
-
-      .shadow-orb-1 {
-        width: 17vw;
-        height: 17vw;
-        margin: -8.5vw 0 0 -8.5vw;
-        animation: orbit-4 30s linear infinite;
-      }
-
-      .shadow-orb-2 {
-        width: 13vw;
-        height: 13vw;
-        margin: -6.5vw 0 0 -6.5vw;
-        animation: orbit-5 22s linear infinite reverse;
-      }
-
-      @keyframes orbit-4 {
-        from {
-          transform: rotate(0deg) translateX(11vw) rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg) translateX(11vw) rotate(-360deg);
-        }
-      }
-
-      @keyframes orbit-5 {
-        from {
-          transform: rotate(0deg) translateX(6vw) rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg) translateX(6vw) rotate(-360deg);
-        }
-      }
-
-      @keyframes orbit-1 {
-        from {
-          transform: rotate(0deg) translateX(13vw) rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg) translateX(13vw) rotate(-360deg);
-        }
-      }
-
-      @keyframes orbit-2 {
-        from {
-          transform: rotate(0deg) translateX(9vw) rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg) translateX(9vw) rotate(-360deg);
-        }
-      }
-
-      @keyframes orbit-3 {
-        from {
-          transform: rotate(0deg) translateX(7vw) rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg) translateX(7vw) rotate(-360deg);
-        }
-      }
-
-      .sphere-1,
-      .sphere-2,
-      .sphere-3,
-      .shadow-orb-1,
-      .shadow-orb-2 {
-        animation: none;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .sphere-1,
-        .sphere-2,
-        .sphere-3,
-        .shadow-orb-1,
-        .shadow-orb-2 {
-          animation: none;
-        }
       }
     </style>
   </head>
