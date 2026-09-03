@@ -783,40 +783,40 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       max-width: none;
     }
 
+    /* The desktop picker (fixed marker, list scrolls past it) reads as a
+       gimmick on a touch screen — swiping a list past a stationary frame
+       isn't a pattern people expect to tap. Tabs instead: every project is
+       a pill, tap one, it's selected — no scroll-snap, no centering. */
     .roulette {
       order: 2;
-      flex: 0 0 3rem;
+      flex: 0 0 auto;
     }
     .roulette-scroll {
-      height: 100%;
-      overflow-x: auto;
-      overflow-y: visible;
-      scroll-snap-type: x mandatory;
+      height: auto;
+      overflow: visible;
+      scroll-snap-type: none;
     }
     .roulette-marker {
-      top: -0.5rem;
-      bottom: -0.5rem;
-      left: 50%;
-      right: auto;
-      height: auto;
-      width: 4.5rem;
-      transform: translateX(-50%);
-      border-left: none;
-      border-top: 2px solid var(--marker-accent, var(--accent-gold));
-      background: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 12%, transparent),
-        transparent 70%
-      );
+      display: none;
     }
     .roulette-track {
       flex-direction: row;
-      padding: 0 calc(50% - 3rem);
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0;
     }
     .roulette-item {
       flex: 0 0 auto;
-      padding: 0 1rem;
-      height: 100%;
+      height: auto;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      scroll-snap-align: none;
+    }
+    .roulette-item[aria-selected='true'] {
+      border-color: var(--marker-accent, var(--accent-gold));
+      background: color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 14%, transparent);
     }
 
     .detail-stage {
@@ -863,7 +863,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     const slots = Array.from(document.querySelectorAll('.detail-slot')) as HTMLElement[];
     const rouletteTrack = document.querySelector('.roulette-scroll') as HTMLElement | null;
     const rouletteTrackInner = document.querySelector('.roulette-track') as HTMLElement | null;
-    const marker = document.querySelector('.roulette-marker') as HTMLElement | null;
+    const roulette = document.querySelector('.roulette') as HTMLElement | null;
 
     if (slots.length > 0) {
       // Vertical padding-percentage resolves against the container's WIDTH
@@ -880,8 +880,8 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
         cells.forEach((cell) => {
           const isSelected = Number(cell.dataset.index) === index;
           cell.setAttribute('aria-selected', String(isSelected));
-          if (isSelected && marker && cell.dataset.accent) {
-            marker.style.setProperty('--marker-accent', cell.dataset.accent);
+          if (isSelected && roulette && cell.dataset.accent) {
+            roulette.style.setProperty('--marker-accent', cell.dataset.accent);
           }
         });
         slots.forEach((slot) => {
