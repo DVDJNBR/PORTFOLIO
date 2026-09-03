@@ -501,6 +501,18 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     margin: 0;
   }
 
+  /* 7.5vw is sized against the viewport, not the space actually left after
+     the photo + gap eat into it — between the mobile breakpoint (where the
+     name gets the full centered width) and full desktop (where the row is
+     wide enough regardless), there's a band where "David Breau" wraps to
+     two lines and the underline bar (pinned to the row's bottom) cuts
+     straight through the second line. Smaller clamp just for that gap. */
+  @media (min-width: 701px) and (max-width: 1000px) {
+    .name {
+      font-size: clamp(2rem, 5.2vw, 5rem);
+    }
+  }
+
   .role {
     font-size: 1.2rem;
     font-weight: 600;
