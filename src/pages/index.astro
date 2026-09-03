@@ -813,15 +813,14 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       padding: 0.3rem 0.85rem;
       text-align: center;
       border-radius: 8px;
-      border: 1px solid transparent;
+      border-left: 2px solid transparent;
       scroll-snap-align: none;
     }
-    /* Same "encart" language as the desktop marker pill (border + soft
-       gradient fill + glow) — just applied straight to the selected row
-       itself here instead of a separate floating marker, since a single
-       fixed marker doesn't make sense once the list is a static stack. */
+    /* Exactly the desktop marker pill's own rule set (border-left, gradient
+       fill, glow) — not a uniform 4-side border, which reads as a different,
+       flatter shape. Thick edge on the left only, soft fade on the rest. */
     .roulette-item[aria-selected='true'] {
-      border-color: var(--marker-accent, var(--accent-gold));
+      border-left-color: var(--marker-accent, var(--accent-gold));
       background: linear-gradient(
         to right,
         color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 12%, transparent),
