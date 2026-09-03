@@ -810,13 +810,24 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     .roulette-item {
       flex: 0 0 auto;
       height: auto;
-      padding: 0.15rem 0.6rem;
+      padding: 0.3rem 0.85rem;
       text-align: center;
-      border-left: 2px solid transparent;
+      border-radius: 8px;
+      border: 1px solid transparent;
       scroll-snap-align: none;
     }
+    /* Same "encart" language as the desktop marker pill (border + soft
+       gradient fill + glow) — just applied straight to the selected row
+       itself here instead of a separate floating marker, since a single
+       fixed marker doesn't make sense once the list is a static stack. */
     .roulette-item[aria-selected='true'] {
-      border-left-color: var(--marker-accent, var(--accent-gold));
+      border-color: var(--marker-accent, var(--accent-gold));
+      background: linear-gradient(
+        to right,
+        color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 12%, transparent),
+        transparent 70%
+      );
+      box-shadow: 0 0 14px -4px color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 65%, transparent);
     }
 
     .detail-stage {
