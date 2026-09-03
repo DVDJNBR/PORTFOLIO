@@ -785,8 +785,10 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
 
     /* The desktop picker (fixed marker, list scrolls past it) reads as a
        gimmick on a touch screen — swiping a list past a stationary frame
-       isn't a pattern people expect to tap. Tabs instead: every project is
-       a pill, tap one, it's selected — no scroll-snap, no centering. */
+       isn't a pattern people expect to tap. A tab row read too unfamiliar
+       in turn — a compact vertical stack, same idea as desktop's list
+       (bold + full opacity = selected, inherited from the base rule below)
+       just without the scroll-driven marker, reads the most natural. */
     .roulette {
       order: 2;
       flex: 0 0 auto;
@@ -800,23 +802,21 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       display: none;
     }
     .roulette-track {
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
       padding: 0;
     }
     .roulette-item {
       flex: 0 0 auto;
       height: auto;
-      padding: 0.5rem 0.9rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
+      padding: 0.15rem 0.6rem;
+      text-align: center;
+      border-left: 2px solid transparent;
       scroll-snap-align: none;
     }
     .roulette-item[aria-selected='true'] {
-      border-color: var(--marker-accent, var(--accent-gold));
-      background: color-mix(in srgb, var(--marker-accent, var(--accent-gold)) 14%, transparent);
+      border-left-color: var(--marker-accent, var(--accent-gold));
     }
 
     .detail-stage {
