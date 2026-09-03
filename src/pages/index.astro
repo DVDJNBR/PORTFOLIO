@@ -247,9 +247,9 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                             fallback (backdrop/depth) for every other project in this loop. */}
                         <Fragment slot="visual">
                           {entry.id.startsWith('nyc-taxi') ? (
-                            <img src="/img/nyc-taxi-chart.png" alt="Courses de taxi par heure à New York" class="silhouette" />
+                            <img src="/img/nyc-taxi-chart.png" alt="Courses de taxi par heure à New York" class="silhouette chart-visual" />
                           ) : entry.id.startsWith('watt-watcher') ? (
-                            <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette" />
+                            <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette chart-visual" />
                           ) : (
                             <>
                               {projectAssets[entry.id]?.depth && (
@@ -607,6 +607,16 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
   }
 
   @media (max-width: 700px) {
+    /* Content routinely runs taller than 100dvh on short phones — flex
+       centering then overflows equally both ways, pushing the photo up
+       under the fixed social-dock and the tags panel down under the
+       scroll-cue. Top-anchor instead, clear the dock explicitly, and let
+       this level scroll internally as a safety net rather than clip. */
+    .level-presentation {
+      justify-content: flex-start;
+      padding: 4.5rem 1.5rem 1.5rem;
+      overflow-y: auto;
+    }
     .presentation-inner {
       flex-direction: column;
       align-items: center;
@@ -632,9 +642,23 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       max-width: 40ch;
       text-align: center;
     }
+    /* Flatten the desktop's circular 2-3-3-3-2 row grouping into one
+       free-flowing wrap — that grouping exists to read as a circle next
+       to the photo, which doesn't apply once everything is stacked. */
     .tags-panel {
+      width: 100%;
+      max-width: 420px;
       margin-top: 1.5rem;
+      /* Clears the absolutely-positioned .scroll-cue pinned to the bottom
+         of this level, so the last badge row doesn't sit under it. */
+      margin-bottom: 3.5rem;
+      flex: 0 0 auto;
+      flex-direction: row;
+      flex-wrap: wrap;
       justify-content: center;
+    }
+    .tags-row {
+      display: contents;
     }
   }
 
@@ -764,7 +788,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       flex: 0 0 3rem;
     }
     .roulette-scroll {
-      height: auto;
+      height: 100%;
       overflow-x: auto;
       overflow-y: visible;
       scroll-snap-type: x mandatory;
@@ -800,6 +824,14 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       flex: 1;
       order: 1;
       min-height: 360px;
+    }
+
+    /* These are full rectangular charts, not sparse cutout art — the mobile
+       .silhouette treatment (centered background behind the text panel)
+       works for the other projects' silhouettes but just collides with a
+       solid chart. Text stands alone here instead of fighting the image. */
+    .chart-visual {
+      display: none;
     }
   }
 
