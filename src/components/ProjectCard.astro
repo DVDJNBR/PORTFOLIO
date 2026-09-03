@@ -50,7 +50,11 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
     z-index: 0;
   }
 
-  .silhouette {
+  /* :global — the visual slot can be filled from outside this component
+     (index.astro's per-project Fragment), and Astro's scoped styles don't
+     cross that boundary, so these two classes need to stay unscoped to
+     style images regardless of which component wrote the <img> tag. */
+  :global(.silhouette) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -61,7 +65,7 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
     z-index: 1;
   }
 
-  .silhouette-depth {
+  :global(.silhouette-depth) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -109,8 +113,8 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
     bottom: 0;
     width: 2px;
     z-index: 2;
-    background: linear-gradient(to bottom, transparent, var(--accent-gold), transparent);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-gold) 80%, transparent);
+    background: linear-gradient(to bottom, transparent, var(--cell-glow, var(--accent-gold)), transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 80%, transparent);
     animation: panel-beam 0.35s var(--ease-apple) forwards;
   }
 
@@ -208,11 +212,11 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
       justify-content: center;
     }
 
-    .silhouette-depth {
+    :global(.silhouette-depth) {
       display: none;
     }
 
-    .silhouette {
+    :global(.silhouette) {
       position: static;
       width: auto;
       max-width: 220px;
