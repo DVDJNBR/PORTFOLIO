@@ -198,15 +198,24 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
   }
 
   @media (max-width: 700px) {
+    /* Both .visual and .info used to be absolutely positioned over the same
+       box — fine for the sparse cutout art (fish, X/O, France map) where
+       the text sits over mostly-empty space, but it made full rectangular
+       charts (NYC/Watt-Watcher) illegible against the description behind
+       them. Stacked in normal flow instead — image band on top, text
+       below — so nothing ever overlaps, for every project alike. */
     .project-block {
       aspect-ratio: auto;
-      height: 100%;
+      height: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .visual {
-      position: absolute;
-      inset: 0;
+      position: static;
       width: 100%;
+      height: 140px;
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -219,22 +228,19 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
     :global(.silhouette) {
       position: static;
       width: auto;
-      max-width: 220px;
+      max-width: 100%;
+      max-height: 100%;
       height: auto;
       object-fit: contain;
       transform: none;
     }
 
     .info {
-      position: absolute;
-      top: 50%;
-      right: 0;
-      left: auto;
-      bottom: auto;
+      position: static;
+      width: 100%;
+      max-width: none;
       height: auto;
-      width: auto;
-      max-width: calc(100% - 1.5rem);
-      transform: translateY(-50%);
+      transform: none;
       padding: 1.25rem 1.5rem;
     }
   }

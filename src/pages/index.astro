@@ -247,9 +247,9 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                             fallback (backdrop/depth) for every other project in this loop. */}
                         <Fragment slot="visual">
                           {entry.id.startsWith('nyc-taxi') ? (
-                            <img src="/img/nyc-taxi-chart.png" alt="Courses de taxi par heure à New York" class="silhouette chart-visual" />
+                            <img src="/img/nyc-taxi-chart.png" alt="Courses de taxi par heure à New York" class="silhouette" />
                           ) : entry.id.startsWith('watt-watcher') ? (
-                            <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette chart-visual" />
+                            <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette" />
                           ) : (
                             <>
                               {projectAssets[entry.id]?.depth && (
@@ -836,12 +836,11 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       min-height: 360px;
     }
 
-    /* These are full rectangular charts, not sparse cutout art — the mobile
-       .silhouette treatment (centered background behind the text panel)
-       works for the other projects' silhouettes but just collides with a
-       solid chart. Text stands alone here instead of fighting the image. */
-    .chart-visual {
-      display: none;
+    /* ProjectCard's mobile layout now stacks image above text in normal
+       flow instead of absolutely overlapping them, so .detail-slot needs
+       to grow with that content rather than being clipped to a fixed box. */
+    .detail-slot {
+      position: static;
     }
   }
 
