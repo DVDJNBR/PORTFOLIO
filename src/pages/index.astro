@@ -165,7 +165,10 @@ try {
               data avec un double cursus data analyst / data ingénieur. Je construis des pipelines
               et des architectures cloud pour alimenter vos dashboards.
             </p>
+            </div>
+          </div>
 
+          <div class="tags-panel">
             <div class="learning-badges">
               <a
                 href="https://www.codewars.com/users/DVDJNBR"
@@ -196,10 +199,6 @@ try {
                 </span>
               </a>
             </div>
-            </div>
-          </div>
-
-          <div class="tags-panel">
             {tagRows.map((row) => (
               <div class="tags-row">
                 {row.map((tag) => (
@@ -555,11 +554,14 @@ try {
     text-align-last: justify;
   }
 
+  /* Empilés, pas en rangée — un futur 3e badge n'est qu'une ligne de plus,
+     la largeur ne bouge pas. Vit dans .tags-panel plutôt que sous la bio,
+     au-dessus du cercle de tags plutôt que d'allonger la carte. */
   .learning-badges {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.25rem;
+    gap: 0.5rem;
   }
 
   .codewars-badge,
@@ -737,6 +739,12 @@ try {
     }
     .tags-row {
       display: contents;
+    }
+    /* tags-panel goes row+wrap here for the tag pills — force the badge
+       stack onto its own line first instead of inlining with them. */
+    .learning-badges {
+      flex-basis: 100%;
+      margin-bottom: 0.85rem;
     }
   }
 
