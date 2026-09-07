@@ -239,6 +239,7 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
                         backdrop={projectAssets[entry.id]?.backdrop}
                         depth={projectAssets[entry.id]?.depth}
                         accent={entry.data.accent}
+                        denseVisual={entry.id.startsWith('nyc-taxi') || entry.id.startsWith('watt-watcher')}
                       >
                         {/* Always an explicit Fragment, never a bare conditional — Astro
                             decides whether the "visual" slot is filled per-component, not
@@ -502,14 +503,19 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
   }
 
   /* 7.5vw is sized against the viewport, not the space actually left after
-     the photo + gap eat into it — between the mobile breakpoint (where the
-     name gets the full centered width) and full desktop (where the row is
-     wide enough regardless), there's a band where "David Breau" wraps to
-     two lines and the underline bar (pinned to the row's bottom) cuts
-     straight through the second line. Smaller clamp just for that gap. */
-  @media (min-width: 701px) and (max-width: 1000px) {
+     the photo + gap eat into it — right after the mobile breakpoint,
+     .presentation-card-wrap is still narrow (the tags panel takes a fixed
+     chunk beside it) so 7.5vw overshoots and "David Breau" wraps to two
+     lines, with the underline bar (pinned to the row's bottom) then only
+     running under the second line instead of the whole name. Measured
+     empirically (headless, binary-searched the largest non-wrapping size at
+     each width) to get a formula that stays under that wrap threshold with
+     margin across 701-900px, and hands off at 900px to the normal 7.5vw
+     rule at the point where 7.5vw is already safe on its own — so there's
+     no visible jump at the handoff either. */
+  @media (min-width: 701px) and (max-width: 900px) {
     .name {
-      font-size: clamp(2rem, 5.2vw, 5rem);
+      font-size: clamp(1.875rem, calc(-102px + 18.85vw), 5rem);
     }
   }
 
@@ -709,6 +715,14 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
     aspect-ratio: 2.2 / 1;
     margin: 0 auto;
     flex-shrink: 0;
+    /* Without this, a short roulette list can end up taller than its own
+       aspect-ratio box (see the centering-padding note in the script below),
+       and since a flex item's automatic min-height ignores aspect-ratio
+       when overflow is visible, that inflated content silently grows
+       .stage itself — leaving the roulette-marker's fixed top:50% pointing
+       at the wrong item. overflow-y:hidden makes aspect-ratio authoritative
+       again; overflow-x stays auto (nothing ever overflows horizontally). */
+    overflow-y: hidden;
   }
 
   /* ── Roulette — vertical picker; the item nearest the marker is selected,

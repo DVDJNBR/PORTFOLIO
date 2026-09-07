@@ -7,12 +7,16 @@ interface Props {
   backdrop?: string | null;
   depth?: string | null;
   accent?: string;
+  denseVisual?: boolean;
 }
 
-const { title, description, url, tags, backdrop = null, depth = null, accent } = Astro.props;
+const { title, description, url, tags, backdrop = null, depth = null, accent, denseVisual = false } = Astro.props;
 ---
 
-<div class="project-block" style={accent ? `--cell-glow: ${accent};` : undefined}>
+<div
+  class={`project-block${denseVisual ? ' is-dense' : ''}`}
+  style={accent ? `--cell-glow: ${accent};` : undefined}
+>
   <div class="visual">
     <slot name="visual">
       {depth && <img src={depth} alt="" class="silhouette-depth" />}
@@ -102,6 +106,16 @@ const { title, description, url, tags, backdrop = null, depth = null, accent } =
     transition: background 0.25s var(--ease-apple);
     clip-path: inset(0 100% 0 0);
     animation: panel-reveal 0.35s var(--ease-apple) forwards;
+  }
+
+  /* The 40px bleed left of .visual's edge above is meant to blend a sparse
+     cutout silhouette softly under the text panel. For a full-bleed
+     rectangular chart (denseVisual) there's no transparent margin to blend
+     into — every wrapped line's left edge sits directly on busy chart
+     pixels instead, which only gets worse as the card narrows. Give those
+     a clean, non-overlapping split instead. */
+  .project-block.is-dense .info {
+    left: 66.6667%;
   }
   .info:hover {
     background: rgba(0, 0, 0, 0.65);
