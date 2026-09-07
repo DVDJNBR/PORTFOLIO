@@ -647,14 +647,21 @@ const preloadImages = Object.values(projectAssets).flatMap((a) =>
       align-items: center;
       text-align: center;
     }
+    /* Keep the desktop's side-by-side photo+name (bar running under both,
+       photo-blue fading into it) instead of stacking — stacking always put
+       daylight between the photo and the bar, since the bar stays pinned
+       under just the text. Same row, just sized down: a smaller fixed
+       avatar so there's room for the name to stay on one line down to the
+       narrowest phones (checked to 320px). */
     .name-row {
-      flex-direction: column;
-      /* Base rule's align-items:flex-end is a row-axis choice (bottom-align
-         avatar and text). Stacked in a column, that axis becomes horizontal
-         and right-aligns the avatar over just the end of the name instead
-         of centering it above — breaking the line's photo-blue-to-Klein
-         gradient, which is meant to read as starting from the photo. */
       align-items: center;
+    }
+    .name-avatar {
+      width: 64px;
+      margin-bottom: 0;
+    }
+    .name {
+      font-size: 2.1rem;
     }
     .role {
       width: auto !important;
