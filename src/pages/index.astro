@@ -496,11 +496,13 @@ try {
   .tags-panel {
     flex: 0 1 340px;
     min-width: 0;
-    align-self: flex-end;
+    /* Top-anchored, not bottom — badges sit right near the kicker's level
+       instead of floating in the lower half with dead space above them. */
+    align-self: flex-start;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     /* Real gap between the stat badges and the tag circle, not just the
        rows' own tight rhythm — the two need to read as separate groups,
        not one continuous stack. */
