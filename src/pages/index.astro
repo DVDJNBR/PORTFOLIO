@@ -189,13 +189,18 @@ try {
                 target="_blank"
                 rel="noopener noreferrer"
                 class="duolingo-badge"
-                aria-label="Duolingo — 964 jours, 44 260 xp"
+                aria-label="Duolingo"
               >
                 <span class="stat-pill">
                   <img src="/img/duolingo-icon.png" alt="" width="18" height="18" />
-                  <span class="stat-rank" style="color:#FF9600" data-duolingo-streak>964</span>
+                  <!-- No hardcoded fallback number — a stale streak/xp is
+                       wrong the moment it's out of date, and briefly
+                       flashing one on every load before the real fetch
+                       resolves looked broken. A dash reads as "loading",
+                       never as a wrong number. -->
+                  <span class="stat-rank" style="color:#FF9600" data-duolingo-streak>–</span>
                   <span class="stat-sep">·</span>
-                  <span class="stat-score" data-duolingo-xp>44,260</span>
+                  <span class="stat-score" data-duolingo-xp>–</span>
                 </span>
               </a>
             </div>
