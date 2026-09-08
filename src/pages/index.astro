@@ -199,13 +199,15 @@ try {
                 </span>
               </a>
             </div>
-            {tagRows.map((row) => (
-              <div class="tags-row">
-                {row.map((tag) => (
-                  <img class="tech-tag" src={tagBadge(tag)} alt={tag} loading="lazy" />
-                ))}
-              </div>
-            ))}
+            <div class="tags-circle">
+              {tagRows.map((row) => (
+                <div class="tags-row">
+                  {row.map((tag) => (
+                    <img class="tech-tag" src={tagBadge(tag)} alt={tag} loading="lazy" />
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -495,6 +497,18 @@ try {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* Real gap between the stat badges and the tag circle, not just the
+       rows' own tight rhythm — the two need to read as separate groups,
+       not one continuous stack. */
+    gap: 1.75rem;
+  }
+
+  /* The 5 rows tapering 2-3-3-3-2 that read as a circle — their own tight
+     gap, independent of the badges↔circle spacing above. */
+  .tags-circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 0.65rem;
   }
 
@@ -736,6 +750,18 @@ try {
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
+      /* .tags-circle and .tags-row both flatten to display:contents below,
+         so every tag image becomes a direct flex child of .tags-panel
+         itself here — this gap is what actually spaces them, not the
+         desktop rule's 1.75rem (that gap is for keeping the badges group
+         apart from the circle, meaningless once everything's one flat
+         wrapped row). */
+      gap: 0.55rem;
+    }
+    /* Both wrapper levels flatten out so the tag images become direct
+       flex items of .tags-panel's row+wrap, same trick two levels deep. */
+    .tags-circle {
+      display: contents;
     }
     .tags-row {
       display: contents;
@@ -783,6 +809,12 @@ try {
     aspect-ratio: 2.2 / 1;
     margin: 0 auto;
     flex-shrink: 0;
+    /* .roulette-marker bleeds 0.5rem past .roulette's own left edge (its
+       rounded cap). Setting overflow-y below forces overflow-x to 'auto'
+       too (a paired-axis rule neither browser lets you opt out of), and
+       auto clips exactly like hidden until something scrolls it — so
+       without this padding the marker's left cap gets silently cut off. */
+    padding-left: 0.5rem;
     /* Without this, a short roulette list can end up taller than its own
        aspect-ratio box (see the centering-padding note in the script below),
        and since a flex item's automatic min-height ignores aspect-ratio
@@ -875,6 +907,9 @@ try {
       aspect-ratio: auto;
       height: auto;
       max-width: none;
+      /* Desktop-only fix (roulette-marker doesn't exist here) — stacked
+         content should stay centered, not nudged right. */
+      padding-left: 0;
     }
 
     /* The desktop picker (fixed marker, list scrolls past it) reads as a
