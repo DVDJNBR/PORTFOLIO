@@ -501,17 +501,14 @@ try {
   .tags-panel {
     flex: 0 1 340px;
     min-width: 0;
-    /* Top-anchored, not bottom — badges sit right near the kicker's level
-       instead of floating in the lower half with dead space above them. */
     align-self: flex-start;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    /* Real gap between the stat badges and the tag circle, not just the
-       rows' own tight rhythm — the two need to read as separate groups,
-       not one continuous stack. */
-    gap: 1.75rem;
+    /* .learning-badges is absolutely positioned now (see below), so this
+       clears room for it above the tag circle instead of a flex gap. */
+    margin-top: 90px;
   }
 
   /* The 5 rows tapering 2-3-3-3-2 that read as a circle — their own tight
@@ -578,12 +575,17 @@ try {
   }
 
   /* Empilés, pas en rangée — un futur 3e badge n'est qu'une ligne de plus,
-     la largeur ne bouge pas. Vit dans .tags-panel plutôt que sous la bio,
-     au-dessus du cercle de tags plutôt que d'allonger la carte. */
+     la largeur ne bouge pas. Ancré en absolu au coin haut-droit de
+     .presentation-inner (pas dans le flux de .tags-panel) — la seule
+     façon d'obtenir une position fixe en pixels depuis le bord droit,
+     indépendante de la largeur de la colonne des tags. */
   .learning-badges {
+    position: absolute;
+    top: 0;
+    right: 8px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     gap: 0.5rem;
   }
 
@@ -776,8 +778,12 @@ try {
       display: contents;
     }
     /* tags-panel goes row+wrap here for the tag pills — force the badge
-       stack onto its own line first instead of inlining with them. */
+       stack onto its own line first instead of inlining with them. Back to
+       static/centered too: the desktop rule's absolute top-right pin only
+       makes sense next to the tag circle, not stacked above everything. */
     .learning-badges {
+      position: static;
+      align-items: center;
       flex-basis: 100%;
       margin-bottom: 0.85rem;
     }
