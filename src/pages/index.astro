@@ -474,7 +474,11 @@ try {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 8px;
+    /* Square on the bottom-left specifically — that's exactly the corner
+       the underline bar starts from, and a rounded corner there carves
+       away real silhouette pixels right at the join, opening a visible
+       gap between the photo and the bar. */
+    border-radius: 8px 8px 8px 0;
   }
 
   .bio {
