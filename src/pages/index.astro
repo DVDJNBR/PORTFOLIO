@@ -568,8 +568,6 @@ try {
     color: var(--fg);
     margin: 0.6rem 0 0;
     display: block;
-    text-align: justify;
-    text-align-last: justify;
   }
 
   /* Empilés, pas en rangée — un futur 3e badge n'est qu'une ligne de plus,
@@ -1088,20 +1086,21 @@ try {
     }
 
     // ── Line up the role text under "David Breau" only — not the photo
-    // beside it. text-align-last does the stretching; this just tells it
-    // where to start and how far to stretch. ────────────────────────────
+    // beside it. Just a left offset now: text-align-last:justify used to
+    // also force the role's box to the name's exact width, stretching
+    // "Data analyst / Data ingénieur" (much shorter than "David Breau" at
+    // this font size) into huge gaps between words to fill it. ──────────
     const nameLine = document.getElementById('name-line');
     const roleLine = document.getElementById('role-line');
     const roleCard = document.querySelector('.presentation-card') as HTMLElement | null;
     if (nameLine && roleLine && roleCard) {
-      const matchWidth = () => {
+      const matchOffset = () => {
         const nameRect = nameLine.getBoundingClientRect();
         const cardRect = roleCard.getBoundingClientRect();
         roleLine.style.marginLeft = `${nameRect.left - cardRect.left}px`;
-        roleLine.style.width = `${nameRect.width}px`;
       };
-      matchWidth();
-      window.addEventListener('resize', matchWidth);
+      matchOffset();
+      window.addEventListener('resize', matchOffset);
     }
 
     fetch('/api/duolingo')
