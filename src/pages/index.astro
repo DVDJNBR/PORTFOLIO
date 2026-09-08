@@ -408,7 +408,7 @@ try {
     --kyu-black: #d6d3ce;
     position: relative;
     max-width: 1000px;
-    margin: 0 auto;
+    margin: -80px auto 0;
     width: 100%;
     display: flex;
     align-items: center;
@@ -497,11 +497,13 @@ try {
     display: block;
     width: 100%;
     height: auto;
-    /* Square on the bottom-left specifically — that's exactly the corner
-       the underline bar starts from, and a rounded corner there carves
-       away real silhouette pixels right at the join, opening a visible
-       gap between the photo and the bar. */
-    border-radius: 8px 8px 8px 0;
+    /* Square on BOTH bottom corners — the bar runs the full width right
+       underneath, so either corner being rounded clips a quarter-circle
+       of real (fully opaque) shoulder content, opening a visible notch
+       against the bar regardless of what's actually drawn there. This
+       was the real cause of the "gap under the sleeve" — not a
+       transparent pixel in the source photo, a geometric corner clip. */
+    border-radius: 8px 8px 0 0;
   }
 
   .bio {
@@ -509,7 +511,10 @@ try {
     font-size: 0.98rem;
     line-height: 1.65;
     color: var(--fg-muted);
-    margin: 1.4rem 0 0;
+    /* Lined up with "David" rather than flush with the photo/kicker — the
+       photo eats the first ~134px of that row, so text starting flush
+       left under it reads as unaligned with everything above it. */
+    margin: 1.4rem 0 0 134px;
   }
 
   /* ── Tags — stacked, centered rows tapering 2-3-3-3-2 (no sharp single-
@@ -522,7 +527,7 @@ try {
      compensate. Absolute positioning can't affect flow height at all. */
   .tags-panel {
     position: absolute;
-    top: 344px;
+    top: 304px;
     right: 60px;
     width: 340px;
     display: flex;
@@ -600,7 +605,7 @@ try {
      indépendante de la largeur de la colonne des tags. */
   .learning-badges {
     position: absolute;
-    top: -217px;
+    top: -177px;
     right: 8px;
     display: flex;
     flex-direction: column;
@@ -734,6 +739,11 @@ try {
     .presentation-inner {
       flex-direction: column;
       align-items: center;
+      /* Desktop-only nudge (balances whitespace against the fixed social
+         dock there) — this level already clears the dock itself via its
+         own top padding, so the extra negative margin here would just
+         push content back up under it. */
+      margin-top: 0;
     }
     .presentation-card-wrap {
       width: 100%;
@@ -767,6 +777,7 @@ try {
     }
     .bio {
       max-width: 40ch;
+      margin-left: 0;
       text-align: center;
     }
     /* Flatten the desktop's circular 2-3-3-3-2 row grouping into one
