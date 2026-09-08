@@ -168,42 +168,43 @@ try {
             </div>
           </div>
 
+          <div class="learning-badges">
+            <a
+              href="https://www.codewars.com/users/DVDJNBR"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="codewars-badge"
+              aria-label={`Codewars — ${codewars.rank}, ${codewars.honor} honor`}
+            >
+              <span class="stat-pill">
+                <img src="/img/codewars-icon.png" alt="" width="18" height="18" />
+                <span class="stat-rank" style={`color:${codewars.color}`}>{codewars.rank}</span>
+                <span class="stat-sep">·</span>
+                <span class="stat-score">{codewars.honor.toLocaleString('en-US')}</span>
+              </span>
+            </a>
+            <a
+              href="https://www.duolingo.com/profile/d4v1dbr34u"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="duolingo-badge"
+              aria-label="Duolingo"
+            >
+              <span class="stat-pill">
+                <img src="/img/duolingo-icon.png" alt="" width="18" height="18" />
+                <!-- No hardcoded fallback number — a stale streak/xp is
+                     wrong the moment it's out of date, and briefly
+                     flashing one on every load before the real fetch
+                     resolves looked broken. A dash reads as "loading",
+                     never as a wrong number. -->
+                <span class="stat-rank" style="color:#FF9600" data-duolingo-streak>–</span>
+                <span class="stat-sep">·</span>
+                <span class="stat-score" data-duolingo-xp>–</span>
+              </span>
+            </a>
+          </div>
+
           <div class="tags-panel">
-            <div class="learning-badges">
-              <a
-                href="https://www.codewars.com/users/DVDJNBR"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="codewars-badge"
-                aria-label={`Codewars — ${codewars.rank}, ${codewars.honor} honor`}
-              >
-                <span class="stat-pill">
-                  <img src="/img/codewars-icon.png" alt="" width="18" height="18" />
-                  <span class="stat-rank" style={`color:${codewars.color}`}>{codewars.rank}</span>
-                  <span class="stat-sep">·</span>
-                  <span class="stat-score">{codewars.honor.toLocaleString('en-US')}</span>
-                </span>
-              </a>
-              <a
-                href="https://www.duolingo.com/profile/d4v1dbr34u"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="duolingo-badge"
-                aria-label="Duolingo"
-              >
-                <span class="stat-pill">
-                  <img src="/img/duolingo-icon.png" alt="" width="18" height="18" />
-                  <!-- No hardcoded fallback number — a stale streak/xp is
-                       wrong the moment it's out of date, and briefly
-                       flashing one on every load before the real fetch
-                       resolves looked broken. A dash reads as "loading",
-                       never as a wrong number. -->
-                  <span class="stat-rank" style="color:#FF9600" data-duolingo-streak>–</span>
-                  <span class="stat-sep">·</span>
-                  <span class="stat-score" data-duolingo-xp>–</span>
-                </span>
-              </a>
-            </div>
             <div class="tags-circle">
               {tagRows.map((row) => (
                 <div class="tags-row">
@@ -411,7 +412,13 @@ try {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* Used to matter for centering card-wrap+tags-panel as a pair, but
+       they always filled the full width anyway (card-wrap's flex-grow
+       absorbed whatever was left) so it was already a no-op — until
+       tags-panel went absolute/out-of-flow, leaving card-wrap as the
+       row's only child and centering it solo, drifting the whole left
+       column (photo, name, bio) rightward. */
+    justify-content: flex-start;
     gap: 2rem;
   }
 
@@ -421,6 +428,11 @@ try {
     flex: 2 1 0;
     min-width: 0;
     align-self: flex-start;
+    /* .tags-panel is absolutely positioned (out of flow) below — without
+       this, card-wrap would be the row's only flex item and stretch to
+       fill the whole width, rewrapping the bio and shifting everything
+       whenever the tags panel's own position changes. */
+    max-width: 568px;
   }
 
   .presentation-card {
@@ -504,18 +516,18 @@ try {
      item point at top/bottom — a circle has a flat chord there, not a
      tip). Rows sit close together (a plain gap, not stretched to fill a
      forced box) so the cluster itself reads round, not elongated. ────── */
+  /* Out of flow, like .learning-badges — a margin-top big enough to reach
+     down near "PROJETS" was inflating .presentation-inner's own height,
+     which shifted the whole centered block (bio included) up to
+     compensate. Absolute positioning can't affect flow height at all. */
   .tags-panel {
-    flex: 0 1 340px;
-    min-width: 0;
-    align-self: flex-start;
+    position: absolute;
+    top: 344px;
+    right: 60px;
+    width: 340px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    /* .learning-badges is absolutely positioned now (see below), so this
-       clears room for it above the tag circle instead of a flex gap. */
-    margin-top: 500px;
-    margin-right: 60px;
   }
 
   /* The 5 rows tapering 2-3-3-3-2 that read as a circle — their own tight
@@ -588,7 +600,7 @@ try {
      indépendante de la largeur de la colonne des tags. */
   .learning-badges {
     position: absolute;
-    top: -67px;
+    top: -217px;
     right: 8px;
     display: flex;
     flex-direction: column;
@@ -761,6 +773,7 @@ try {
        free-flowing wrap — that grouping exists to read as a circle next
        to the photo, which doesn't apply once everything is stacked. */
     .tags-panel {
+      position: static;
       width: 100%;
       max-width: 420px;
       margin-top: 1.5rem;
