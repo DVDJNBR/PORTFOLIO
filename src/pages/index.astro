@@ -175,13 +175,13 @@ try {
               target="_blank"
               rel="noopener noreferrer"
               class="codewars-badge"
-              aria-label={`Codewars — ${codewars.rank}, ${codewars.honor} honor`}
+              aria-label={`Codewars — ${codewars.rank}, ${codewars.honor.toLocaleString('en-US')} xp`}
             >
               <span class="stat-pill">
                 <img src="/img/codewars-icon.png" alt="" width="18" height="18" />
                 <span class="stat-rank" style={`color:${codewars.color}`}>{codewars.rank}</span>
                 <span class="stat-sep">·</span>
-                <span class="stat-score">{codewars.honor.toLocaleString('en-US')}</span>
+                <span class="stat-score">{codewars.honor.toLocaleString('en-US')} xp</span>
               </span>
             </a>
             <a
@@ -200,7 +200,7 @@ try {
                      never as a wrong number. -->
                 <span class="stat-rank" style="color:#FF9600" data-duolingo-streak>–</span>
                 <span class="stat-sep">·</span>
-                <span class="stat-score" data-duolingo-xp>–</span>
+                <span class="stat-score"><span data-duolingo-xp>–</span> xp</span>
               </span>
             </a>
           </div>
@@ -637,6 +637,7 @@ try {
     height: 20px;
     padding: 0 0.65rem 0 0.5rem;
     background: #303133;
+    white-space: nowrap;
     /* Parallelogram lean, not a pointed hex — matches Codewars' own badge
        shape (both edges slant the same direction) rather than mirroring
        Duolingo's pointed-both-ends pill. */
