@@ -9,7 +9,6 @@ const projects = defineCollection({
     url: z.string().url(),
     tags: z.array(z.string()),
     briefNumber: z.number().optional(),
-    githubRepo: z.string().optional(),
     accent: z.string().optional(),
   }),
 });

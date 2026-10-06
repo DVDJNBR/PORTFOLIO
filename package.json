@@ -9,6 +9,7 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.63.5",
     "astro": "^5.0.0"
   },
   "devDependencies": {
