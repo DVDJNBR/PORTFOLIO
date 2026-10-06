@@ -68,13 +68,6 @@ const { title, description, url, tags, backdrop = null, depth = null, accent, de
     background: radial-gradient(circle at center, rgba(30, 30, 38, 0.35) 0%, transparent 70%);
   }
 
-<<<<<<< HEAD
-=======
-  /* :global — the visual slot can be filled from outside this component
-     (index.astro's per-project Fragment), and Astro's scoped styles don't
-     cross that boundary, so these two classes need to stay unscoped to
-     style images regardless of which component wrote the <img> tag. */
->>>>>>> origin/main
   :global(.silhouette) {
     position: absolute;
     inset: 0;
@@ -111,47 +104,12 @@ const { title, description, url, tags, backdrop = null, depth = null, accent, de
     color: inherit;
     padding: 1.75rem 2rem;
     box-sizing: border-box;
-<<<<<<< HEAD
     z-index: 2;
     background: rgba(10, 10, 14, 0.72);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-left: 1px solid rgba(255, 255, 255, 0.07);
     transition: background 0.25s var(--ease-apple), border-color 0.25s var(--ease-apple);
-=======
-    z-index: 1;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.55);
-    border: none;
-    border-radius: 0;
-    transition: background 0.25s var(--ease-apple);
-    clip-path: inset(0 100% 0 0);
-    animation: panel-reveal 0.35s var(--ease-apple) forwards;
-  }
-
-  /* The 40px bleed left of .visual's edge above is meant to blend a sparse
-     cutout silhouette softly under the text panel. For a full-bleed
-     rectangular chart (denseVisual) there's no transparent margin to blend
-     into — every wrapped line's left edge sits directly on busy chart
-     pixels instead, which only gets worse as the card narrows. Give those
-     a clean, non-overlapping split instead. */
-  .project-block.is-dense .info {
-    left: 66.6667%;
-  }
-  .info:hover {
-    background: rgba(0, 0, 0, 0.65);
-  }
-  .info::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    z-index: 2;
-    background: linear-gradient(to bottom, transparent, var(--cell-glow, var(--accent-gold)), transparent);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--cell-glow, var(--accent-gold)) 80%, transparent);
-    animation: panel-beam 0.35s var(--ease-apple) forwards;
->>>>>>> origin/main
   }
 
   .info:hover {
@@ -178,26 +136,15 @@ const { title, description, url, tags, backdrop = null, depth = null, accent, de
     opacity: 0.85;
   }
 
-<<<<<<< HEAD
   .project-title {
-=======
-  .fighter-name {
->>>>>>> origin/main
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.55rem;
     line-height: 1.15;
-<<<<<<< HEAD
     letter-spacing: -0.02em;
     color: #ffffff;
     margin: 0;
   }
-=======
-    letter-spacing: -0.01em;
-    color: var(--fg);
-  }
-
->>>>>>> origin/main
 
   .info-desc {
     margin: 0;
@@ -262,12 +209,6 @@ const { title, description, url, tags, backdrop = null, depth = null, accent, de
   }
 
   @media (max-width: 700px) {
-    /* Both .visual and .info used to be absolutely positioned over the same
-       box — fine for the sparse cutout art (fish, X/O, France map) where
-       the text sits over mostly-empty space, but it made full rectangular
-       charts (NYC/Watt-Watcher) illegible against the description behind
-       them. Stacked in normal flow instead — image band on top, text
-       below — so nothing ever overlaps, for every project alike. */
     .project-block {
       aspect-ratio: auto;
       height: auto;
@@ -276,19 +217,9 @@ const { title, description, url, tags, backdrop = null, depth = null, accent, de
     }
 
     .visual {
-<<<<<<< HEAD
       position: relative;
       width: 100%;
       height: 220px;
-=======
-      position: static;
-      width: 100%;
-      height: 140px;
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
->>>>>>> origin/main
     }
 
     :global(.silhouette-depth) {
@@ -306,21 +237,12 @@ const { title, description, url, tags, backdrop = null, depth = null, accent, de
     }
 
     .info {
-<<<<<<< HEAD
       position: relative;
       width: 100%;
       height: auto;
       border-left: none;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       padding: 1.25rem 1.25rem;
-=======
-      position: static;
-      width: 100%;
-      max-width: none;
-      height: auto;
-      transform: none;
-      padding: 1.25rem 1.5rem;
->>>>>>> origin/main
     }
   }
 </style>
