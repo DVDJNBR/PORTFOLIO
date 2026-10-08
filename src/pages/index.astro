@@ -171,7 +171,7 @@ try {
             >
               <span class="stat-pill">
                 <img src="/img/codewars-icon.png" alt="" width="18" height="18" />
-                <span class="stat-rank" style={`color:${codewars.color}`}>{codewars.rank}</span>
+                <span class="stat-rank">{codewars.rank}</span>
                 <span class="stat-sep">·</span>
                 <span class="stat-score">{codewars.honor.toLocaleString('en-US')} xp</span>
               </span>
@@ -185,7 +185,7 @@ try {
             >
               <span class="stat-pill">
                 <img src="/img/duolingo-icon.png" alt="" width="18" height="18" />
-                <span class="stat-rank" style="color:#FF9600" data-duolingo-streak>–</span>
+                <span class="stat-rank" data-duolingo-streak>–</span>
                 <span class="stat-sep">·</span>
                 <span class="stat-score"><span data-duolingo-xp>–</span> xp</span>
               </span>
@@ -264,7 +264,7 @@ try {
                       hasWattWatcherVideo ? (
                         <video
                           src="/video/watt-watcher.mp4"
-                          poster="/img/watt-watcher-chart.png"
+                          poster="/img/watt-watcher-poster.png"
                           class="silhouette"
                           autoplay
                           loop
@@ -272,10 +272,10 @@ try {
                           playsinline
                           preload="none"
                         >
-                          <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette" />
+                          <img src="/img/watt-watcher-poster.png" alt="Carte temps réel des centrales et météo — Watt Watcher" class="silhouette" />
                         </video>
                       ) : (
-                        <img src="/img/watt-watcher-chart.png" alt="Mix électrique français sur une semaine" class="silhouette" />
+                        <img src="/img/watt-watcher-poster.png" alt="Carte temps réel des centrales et météo — Watt Watcher" class="silhouette" />
                       )
                     ) : (
                       <>
@@ -509,6 +509,7 @@ try {
   }
   .stat-rank {
     font-weight: 700;
+    color: #ffffff;
   }
   .stat-sep {
     color: #6a6a6c;
@@ -649,7 +650,7 @@ try {
     margin: 0 auto;
     flex-shrink: 0;
     border-radius: 16px;
-    background: rgba(14, 14, 18, 0.65);
+    background: #12100e;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.85);
     overflow: hidden;
